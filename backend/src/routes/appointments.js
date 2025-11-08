@@ -4,73 +4,93 @@ import Appointment from "../models/Appointment.js";
 
 const router = express.Router();
 
+// ✅ Create Appointment
 router.post("/", auth, async (req, res) => {
   try {
-    const { title, description, date } = req.body;
-    if (!title || !date)
-      return res.status(400).json({ error: "title & date required" });
-
-    const appt = await Appointment.create({
-      user: req.user.id,
-      title,
-      description,
+    const {
+      procedure,
+      center,
+      fullName,
+      mobile,
+      email,
+      doctor,
       date,
+      time,
+      paymentMethod,
+    } = req.body;
+
+    if (!procedure || !center || !fullName || !mobile || !date || !time)
+      return res.status(400).json({ error: "All required fields must be filled" });
+
+    const newAppt = await Appointment.create({
+      user: req.user.id,
+      procedure,
+      center,
+      fullName,
+      mobile,
+      email,
+      doctor,
+      date,
+      time,
+      paymentMethod,
+      paymentStatus: paymentMethod === "Pay at Center" ? "Pending" : "Completed",
     });
 
-    res.json({ ok: true, appointment: appt });
+    res.json({ ok: true, appointment: newAppt });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
+// ✅ Get all Appointments for logged-in user
 router.get("/", auth, async (req, res) => {
   try {
     const appts = await Appointment.find({ user: req.user.id }).sort({ date: -1 });
     res.json({ ok: true, appointments: appts });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
-
+// ✅ Get single Appointment
 router.get("/:id", auth, async (req, res) => {
   try {
     const appt = await Appointment.findOne({ _id: req.params.id, user: req.user.id });
-    if (!appt) return res.status(404).json({ error: "Not found" });
+    if (!appt) return res.status(404).json({ error: "Not Found" });
     res.json({ ok: true, appointment: appt });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
+// ✅ Update Appointment (for status updates)
 router.put("/:id", auth, async (req, res) => {
   try {
-    const data = req.body;
-    const appt = await Appointment.findOneAndUpdate(
+    const updated = await Appointment.findOneAndUpdate(
       { _id: req.params.id, user: req.user.id },
-      data,
+      req.body,
       { new: true }
     );
-    if (!appt) return res.status(404).json({ error: "Not found" });
-    res.json({ ok: true, appointment: appt });
+    if (!updated) return res.status(404).json({ error: "Not Found" });
+    res.json({ ok: true, appointment: updated });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
-
+// ✅ Delete Appointment
 router.delete("/:id", auth, async (req, res) => {
   try {
-    const appt = await Appointment.findOneAndDelete({ _id: req.params.id, user: req.user.id });
-    if (!appt) return res.status(404).json({ error: "Not found" });
+    const deleted = await Appointment.findOneAndDelete({ _id: req.params.id, user: req.user.id });
+    if (!deleted) return res.status(404).json({ error: "Not Found" });
     res.json({ ok: true, msg: "Deleted" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Server error" });
+    res.status(500).json({ error: "Server Error" });
   }
 });
 
