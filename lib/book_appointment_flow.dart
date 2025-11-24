@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import './api_service.dart';
+import 'auth_service.dart';
 
 class BookAppointmentFlow extends StatefulWidget {
   const BookAppointmentFlow({super.key});
@@ -321,7 +323,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
               border: Border.all(color: const Color(0xFFE5E7EB)),
             ),
             child: DropdownButtonFormField<String>(
-              value: selectedCenter,
+              initialValue: selectedCenter,
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -679,41 +681,158 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
     );
   }
 
-  Widget _buildCalendar() {
-    return Column(
-      children: [
-        // Week days
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-              .map((day) => SizedBox(
-            width: 40,
-            child: Text(
-              day,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF6B7280),
-              ),
+DateTime _focusedDate = DateTime.now();
+DateTime? _selectedDate;
+
+Widget _buildCalendar() {
+
+  // Get first day and number of days in current month
+  final firstDayOfMonth = DateTime(_focusedDate.year, _focusedDate.month, 1);
+  final daysInMonth = DateTime(_focusedDate.year, _focusedDate.month + 1, 0).day;
+  final startWeekday = firstDayOfMonth.weekday; // 1 = Mon ... 7 = Sun
+
+  List<Widget> dayWidgets = [];
+
+  // Add blanks for offset days before month starts
+  for (int i = 1; i < startWeekday; i++) {
+    dayWidgets.add(const SizedBox(width: 42, height: 42));
+  }
+
+  // Add actual dates
+  for (int day = 1; day <= daysInMonth; day++) {
+    final currentDate = DateTime(_focusedDate.year, _focusedDate.month, day);
+    final isSelected = _selectedDate != null &&
+        _selectedDate!.year == currentDate.year &&
+        _selectedDate!.month == currentDate.month &&
+        _selectedDate!.day == currentDate.day;
+
+    dayWidgets.add(
+      GestureDetector(
+        onTap: () {
+          setState(() {
+            _selectedDate = currentDate;
+          });
+        },
+        child: Container(
+          width: 42,
+          height: 42,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            gradient: isSelected
+                ? const LinearGradient(
+                    colors: [Color(0xFF7B5FCF), Color(0xFF9B8FCF)],
+                  )
+                : null,
+            border: Border.all(
+              color: isSelected ? const Color(0xFF7B5FCF) : const Color(0xFFE5E7EB),
             ),
-          ))
-              .toList(),
+            color: isSelected ? null : Colors.white,
+          ),
+          child: Text(
+            '$day',
+            style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isSelected ? Colors.white : const Color(0xFF1F2937),
+            ),
+          ),
         ),
-        const SizedBox(height: 16),
-        // Dates
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [27, 28, 29, 30].map((date) => _buildDateCircle(date, false)).toList(),
-        ),
-        const SizedBox(height: 12),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [1, 2, 3, 4, 5, 6, 7].map((date) => _buildDateCircle(date, date == 29)).toList(),
-        ),
-      ],
+      ),
     );
   }
+
+  return Column(
+    children: [
+      // 🔹 Month-Year header with navigation
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.chevron_left, color: Color(0xFF7B5FCF)),
+              onPressed: () {
+                setState(() {
+                  _focusedDate = DateTime(_focusedDate.year, _focusedDate.month - 1);
+                });
+              },
+            ),
+            GestureDetector(
+              onTap: _showMonthYearPicker, // 👇 Step 2 handles this
+              child: Text(
+                '${_monthName(_focusedDate.month)} ${_focusedDate.year}',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1F2937),
+                ),
+              ),
+            ),
+            IconButton(
+              icon: const Icon(Icons.chevron_right, color: Color(0xFF7B5FCF)),
+              onPressed: () {
+                setState(() {
+                  _focusedDate = DateTime(_focusedDate.year, _focusedDate.month + 1);
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+
+      // 🔹 Weekday labels
+      Row(
+        mainAxisAlignment: MainAxisAlignment.spaceAround,
+        children: ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+            .map(
+              (d) => SizedBox(
+                width: 40,
+                child: Text(
+                  d,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    color: Color(0xFF6B7280),
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+      const SizedBox(height: 8),
+
+      // 🔹 Dates grid
+      Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        child: Wrap(
+          alignment: WrapAlignment.center,
+          spacing: 10,
+          runSpacing: 10,
+          children: dayWidgets,
+        ),
+      ),
+    ],
+  );
+}
+
+  
+  void _showMonthYearPicker() async {
+  final picked = await showDatePicker(
+    context: context,
+    initialDate: _focusedDate,
+    firstDate: DateTime(2020),
+    lastDate: DateTime(2030),
+    helpText: "Select Month and Year",
+    initialDatePickerMode: DatePickerMode.year,
+  );
+  if (picked != null) {
+    setState(() {
+      _focusedDate = DateTime(picked.year, picked.month);
+    });
+  }
+}
+
+
 
   Widget _buildMiniCalendar() {
     return Row(
@@ -830,11 +949,58 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
     );
   }
 
-  void _bookAppointment() {
-    // Handle booking
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Appointment Booked Successfully!')),
-    );
-    Navigator.pop(context);
+
+
+  Future<void> _bookAppointment() async {
+    try {
+      // Retrieve token (assuming you saved it after login)
+      final token = await AuthService.getToken();
+
+
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not logged in')),
+        );
+        return;
+      }
+
+      final body = {
+        "procedure": "CT Scan - Abdomen",
+        "center": selectedCenter ?? "Star Center - Delhi",
+        "fullName": fullName,
+        "mobile": mobileNumber,
+        "email": emailAddress,
+        "doctor": referringDoctor,
+        "date": _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+        "time": selectedTime ?? "05:00 PM",
+        "paymentMethod": paymentMethod == 'now' ? "Pay Now" : "Pay at Center",
+      };
+
+      final result = await ApiService.createAppointment(token: token, body: body);
+
+      if (result['ok'] == true) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Appointment booked successfully!')),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed: ${result['error'] ?? 'Unknown error'}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
   }
+
+  String _monthName(int month) {
+    const months = [
+      "January", "February", "March", "April", "May", "June",
+      "July", "August", "September", "October", "November", "December"
+    ];
+    return months[month - 1];
+  }
+
 }

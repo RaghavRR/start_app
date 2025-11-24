@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'api_service.dart';
+import 'auth_service.dart';
+
+List<dynamic> appointments = [];
+bool isLoading = true;
 
 class MyAppointmentPage extends StatefulWidget {
   const MyAppointmentPage({super.key});
@@ -14,8 +19,242 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
   @override
   void initState() {
     super.initState();
+
+    // ✅ Initialize the TabController with 3 tabs
     _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
+
+    // ✅ Then fetch appointments
+    _fetchAppointments();
   }
+
+
+  Future<void> _fetchAppointments() async {
+    try {
+      final token = await AuthService.getToken();
+
+      if (token == null) return;
+
+      final result = await ApiService.fetchAppointments(token:token);
+
+      if (result['ok'] == true) {
+        setState(() {
+          appointments = result['appointments'];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching appointments: $e');
+    }
+  }
+
+  Future<void> _cancelAppointment(String id) async {
+    try {
+      final token = await AuthService.getToken();
+
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not logged in')),
+        );
+        return;
+      }
+
+      final result = await ApiService.deleteAppointment(token: token, id: id);
+
+      if (result['ok'] == true) {
+        setState(() {
+          appointments.removeWhere((appt) => appt['_id'] == id); // ✅ UI se hata do
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Appointment cancelled successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(result['error'] ?? 'Failed to cancel appointment'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
+
+  Future<void> _updateAppointment(String id, DateTime newDate, String newTime) async {
+    try {
+      final token = await AuthService.getToken();
+      if (token == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User not logged in')),
+        );
+        return;
+      }
+
+      final body = {
+        "date": newDate.toIso8601String(),
+        "time": newTime,
+      };
+
+      final result = await ApiService.updateAppointment(token: token, id: id, body: body);
+
+      if (result['ok'] == true) {
+        // ✅ Update local list for instant UI change
+        setState(() {
+          final index = appointments.indexWhere((a) => a['_id'] == id);
+          if (index != -1) {
+            appointments[index]['date'] = newDate.toIso8601String();
+            appointments[index]['time'] = newTime;
+          }
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Appointment rescheduled successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['error'] ?? 'Failed to update appointment')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
+    }
+  }
+
+
+  Future<bool> _showCancelDialog(BuildContext context) async {
+    return await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        title: const Text('Cancel Appointment?'),
+        content: const Text(
+          'Are you sure you want to cancel this appointment? This action cannot be undone.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('No', style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.redAccent,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Yes, Cancel'),
+          ),
+        ],
+      ),
+    ) ?? false;
+  }
+
+
+  void _showRescheduleDialog(BuildContext context, String id, Map<String, dynamic> appt) async {
+    DateTime? newDate;
+    String? newTime;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              title: const Text('Reschedule Appointment'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  // 📅 Select New Date
+                  ListTile(
+                    leading: const Icon(Icons.calendar_today, color: Color(0xFF7B5FCF)),
+                    title: Text(newDate == null
+                        ? 'Select New Date'
+                        : '${newDate!.day}-${newDate!.month}-${newDate!.year}'),
+                    onTap: () async {
+                      final picked = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime.now(),
+                        lastDate: DateTime(2030),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          newDate = picked;
+                        });
+                      }
+                    },
+                  ),
+                  const SizedBox(height: 10),
+
+                  // ⏰ Select New Time
+                  ListTile(
+                    leading: const Icon(Icons.access_time, color: Color(0xFF7B5FCF)),
+                    title: Text(newTime ?? 'Select New Time'),
+                    onTap: () async {
+                      final picked = await showTimePicker(
+                        context: context,
+                        initialTime: TimeOfDay.now(),
+                      );
+                      if (picked != null) {
+                        setState(() {
+                          newTime = picked.format(context);
+                        });
+                      }
+                    },
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('Cancel'),
+                ),
+                ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF7B5FCF),
+                    foregroundColor: Colors.white, 
+                    textStyle: const TextStyle(fontWeight: FontWeight.w600), 
+                  ),
+                  onPressed: () async {
+                    if (newDate == null || newTime == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please select both date and time')),
+                      );
+                      return;
+                    }
+
+                    Navigator.pop(context); // Close dialog
+                    await _updateAppointment(id, newDate!, newTime!);
+                  },
+                  child: const Text('Update'),
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+  }
+
+
+
 
   @override
   void dispose() {
@@ -124,20 +363,37 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
   }
 
   Widget _buildTodayTab() {
-    return ListView(
+    if (isLoading) {
+      return const Center(child: CircularProgressIndicator());
+    }
+
+    if (appointments.isEmpty) {
+      return const Center(
+        child: Text('No appointments found'),
+      );
+    }
+
+    return ListView.builder(
       padding: const EdgeInsets.all(20),
-      children: [
-        _buildAppointmentCard(
+      itemCount: appointments.length,
+      itemBuilder: (context, index) {
+        final appt = appointments[index];
+        return _buildAppointmentCard(
           icon: Icons.medical_services,
-          title: 'CT Scan - Neck',
-          name: 'Abshixav Sharma',
-          date: '05th July 2025',
-          time: '05:22 PM',
-          status: 'Pending',
-        ),
-      ],
+          title: appt['procedure'] ?? 'Unknown',
+          name: appt['fullName'] ?? '',
+          date: appt['date'] != null
+              ? appt['date'].toString().substring(0, 10)
+              : '',
+          time: appt['time'] ?? '',
+          status: appt['status'] ?? 'Pending',
+          id: appt['_id'],
+          appt: appt
+        );
+      },
     );
   }
+
 
   Widget _buildUpcomingTab() {
     return const Center(
@@ -155,6 +411,8 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
     required String date,
     required String time,
     required String status,
+    required String id,
+    required Map<String, dynamic> appt,
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -231,16 +489,21 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),
-                onSelected: (value) {
+                onSelected: (value) async {
                   switch (value) {
                     case 'cancel':
-                    // Handle cancel appointment
+                      final confirmed = await _showCancelDialog(context);
+                      if (confirmed) {
+                        _cancelAppointment(id); // ✅ backend delete call
+                      }
                       break;
                     case 'reschedule':
-                    // Handle reschedule
+                      _showRescheduleDialog(context, id, appt);
                       break;
                     case 'help':
-                    // Handle help
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Help option coming soon...')),
+                      );
                       break;
                   }
                 },

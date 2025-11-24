@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'create_account_page.dart';
 
 class LandingPage extends StatefulWidget {
-  const LandingPage({Key? key}) : super(key: key);
+  const LandingPage({super.key});
 
   @override
   State<LandingPage> createState() => _LandingPageState();
@@ -33,36 +33,23 @@ class _LandingPageState extends State<LandingPage>
     super.dispose();
   }
 
-  void _animateToPosition(double targetPosition) {
-    if (_isAnimating) return;
+void _animateToPosition(double target) {
+  final maxDrag = _buttonWidth - _buttonHeight;
 
-    _isAnimating = true;
-    _positionAnimation = Tween<double>(
-      begin: _dragPosition,
-      end: targetPosition,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.fastOutSlowIn,
-    ));
+  _positionAnimation = Tween<double>(
+    begin: _dragPosition,
+    end: target,
+  ).animate(_animationController);
 
-    _animationController
-      ..reset()
-      ..forward().then((_) {
-        _isAnimating = false;
-        if (targetPosition == 0.0) {
-          // Reset completed
-          setState(() {
-            _dragPosition = 0.0;
-          });
-        }
-      });
+  _animationController
+    ..reset()
+    ..forward();
 
-    _positionAnimation.addListener(() {
-      setState(() {
-        _dragPosition = _positionAnimation.value;
-      });
-    });
-  }
+  _positionAnimation.addListener(() {
+    setState(() => _dragPosition = _positionAnimation.value);
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -169,177 +156,121 @@ class _LandingPageState extends State<LandingPage>
     );
   }
 
-  Widget _buildSwipeButton() {
-    final maxDrag = _buttonWidth - _buttonHeight;
-    final progress = (_dragPosition / maxDrag).clamp(0.0, 1.0);
-    final circleSize = _buttonHeight - 8;
+Widget _buildSwipeButton() {
+  final maxDrag = _buttonWidth - _buttonHeight;
+  final circleSize = _buttonHeight - 8;
 
-    return Container(
-      width: _buttonWidth,
-      height: _buttonHeight,
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            const Color(0xFF3D5A80).withOpacity(0.9),
-            const Color(0xFF4A6FA5).withOpacity(0.9),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(35),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.25),
-            blurRadius: 15,
-            offset: const Offset(0, 5),
-          ),
-        ],
+  return Container(
+    width: _buttonWidth,
+    height: _buttonHeight,
+    decoration: BoxDecoration(
+      gradient: const LinearGradient(
+        colors: [Color(0xFF3D5A80), Color(0xFF4A6FA5)],
       ),
-      child: Stack(
-        children: [
-          // Animated Text
-          AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            opacity: (1.0 - progress * 1.5).clamp(0.0, 1.0),
-            child: const Positioned.fill(
-              child: Center(
-                child: Padding(
-                  padding: EdgeInsets.only(left: 20),
-                  child: Text(
-                    'Get Started',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5,
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ),
-
-          // Progress background (fills as user drags)
-          AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            curve: Curves.easeOut,
+      borderRadius: BorderRadius.circular(35),
+    ),
+    child: Stack(
+      children: [
+        // Background progress
+        Positioned.fill(
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 100),
             width: _dragPosition + circleSize,
-            height: _buttonHeight,
             decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color(0xFF5E7BB5).withOpacity(0.7),
-                  const Color(0xFF6B8BC5).withOpacity(0.7),
-                ],
+              gradient: const LinearGradient(
+                colors: [Color(0xFF5E7BB5), Color(0xFF6B8BC5)],
               ),
               borderRadius: BorderRadius.circular(35),
             ),
           ),
+        ),
 
-          // Draggable circle
-          AnimatedPositioned(
-            duration: const Duration(milliseconds: 100),
-            curve: Curves.easeOut,
-            left: _dragPosition + 4,
-            top: 4,
-            child: GestureDetector(
-              onHorizontalDragUpdate: (details) {
-                if (_isAnimating) return;
-
-                final newPosition = (_dragPosition + details.primaryDelta!)
-                    .clamp(0.0, maxDrag);
-
-                // Use setState only if position actually changed
-                if ((newPosition - _dragPosition).abs() > 0.5) {
-                  setState(() {
-                    _dragPosition = newPosition;
-                  });
-                }
-
-                // Auto complete if dragged more than 75%
-                if (_dragPosition >= maxDrag * 0.75 && !_isAnimating) {
-                  _completeSwipe();
-                }
-              },
-              onHorizontalDragEnd: (details) {
-                if (_isAnimating) return;
-
-                // Check velocity for quick swipe
-                final velocity = details.primaryVelocity ?? 0;
-                if (velocity > 500) {
-                  _completeSwipe();
-                } else if (_dragPosition < maxDrag * 0.75) {
-                  _animateToPosition(0.0);
-                }
-              },
-              onHorizontalDragCancel: () {
-                if (_isAnimating) return;
-                if (_dragPosition < maxDrag * 0.75) {
-                  _animateToPosition(0.0);
-                }
-              },
-              child: Material(
-                elevation: 4,
-                shape: const CircleBorder(),
-                child: Container(
-                  width: circleSize,
-                  height: circleSize,
-                  decoration: BoxDecoration(
-                    gradient: const LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [
-                        Color(0xFFE8E8F0),
-                        Color(0xFFFFFFFF),
-                      ],
-                    ),
-                    shape: BoxShape.circle,
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.15),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: AnimatedRotation(
-                    duration: const Duration(milliseconds: 300),
-                    turns: progress * 0.25, // Slight rotation on drag
-                    child: const Icon(
-                      Icons.arrow_forward,
-                      color: Color(0xFF3D5A80),
-                      size: 26,
-                    ),
-                  ),
+        // Text (fade out)
+        Positioned.fill(
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 200),
+            opacity: 1 - (_dragPosition / maxDrag * 1.2).clamp(0.0, 1.0),
+            child: const Center(
+              child: Text(
+                "Get Started",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  void _completeSwipe() {
-    if (_isAnimating) return;
-
-    final maxDrag = _buttonWidth - _buttonHeight;
-    _animateToPosition(maxDrag);
-
-    // Navigate after animation with reset
-    Future.delayed(const Duration(milliseconds: 350), () {
-      // Reset position before navigation so when user comes back, it's at start
-      _animateToPosition(0.0);
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const CreateAccountPage(),
         ),
-      ).then((_) {
-        // Also reset when returning from next page
-        if (mounted) {
-          _animateToPosition(0.0);
-        }
-      });
+
+        // Draggable Button
+        AnimatedPositioned(
+          duration: const Duration(milliseconds: 0),
+          left: _dragPosition + 4,
+          top: 4,
+          child: GestureDetector(
+            onHorizontalDragUpdate: (details) {
+              final pos = (_dragPosition + details.primaryDelta!)
+                  .clamp(0.0, maxDrag);
+
+              setState(() => _dragPosition = pos);
+
+              if (pos >= maxDrag) {
+                _completeSwipe();
+              }
+            },
+
+            onHorizontalDragEnd: (_) {
+              if (_dragPosition < maxDrag * 0.8) {
+                _animateToPosition(0.0);
+              } else {
+                _completeSwipe();
+              }
+            },
+
+            child: Container(
+              width: circleSize,
+              height: circleSize,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                gradient: const LinearGradient(
+                  colors: [Colors.white, Colors.white70],
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  )
+                ],
+              ),
+              child: const Icon(
+                Icons.arrow_forward,
+                color: Color(0xFF3D5A80),
+                size: 28,
+              ),
+            ),
+          ),
+        )
+      ],
+    ),
+  );
+}
+
+
+void _completeSwipe() {
+  final maxDrag = _buttonWidth - _buttonHeight;
+
+  _animateToPosition(maxDrag);
+
+  Future.delayed(const Duration(milliseconds: 300), () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const CreateAccountPage()),
+    ).then((_) {
+      _animateToPosition(0.0);
     });
-  }
+  });
+}
+
 }
