@@ -36,6 +36,9 @@ async function handleOtpSend(mobile, userData = {}) {
     { upsert: true, new: true }
   );
 
+  console.log("✅ OTP Saved for:", mobile, "OTP:", otpCode);
+
+
   await sendOtp(mobile, otpCode);
   return expiresAt;
 }
