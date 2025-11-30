@@ -1,118 +1,175 @@
 import 'package:flutter/material.dart';
+import 'create_account_page.dart';
 
-class LandingPage extends StatelessWidget {
+class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
 
   @override
+  State<LandingPage> createState() => _LandingPageState();
+}
+
+class _LandingPageState extends State<LandingPage>
+    with SingleTickerProviderStateMixin {
+  double _dragPosition = 0.0;
+  final double _buttonWidth = 300.0;
+  final double _buttonHeight = 65.0;
+  late AnimationController _animationController;
+  late Animation<double> _positionAnimation;
+  bool _isAnimating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _dragPosition = 0.0;
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _animateToPosition(double targetPosition) {
+    if (_isAnimating) return;
+
+    _isAnimating = true;
+    _positionAnimation = Tween<double>(
+      begin: _dragPosition,
+      end: targetPosition,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.fastOutSlowIn,
+    ));
+
+    _animationController
+      ..reset()
+      ..forward().then((_) {
+        _isAnimating = false;
+        if (targetPosition == 0.0) {
+          setState(() {
+            _dragPosition = 0.0;
+          });
+        }
+      });
+
+    _positionAnimation.addListener(() {
+      setState(() {
+        _dragPosition = _positionAnimation.value;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Container(
         width: double.infinity,
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF0B3B8C), Color(0xFF7B3CE6)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF003373),
+              Color(0xFFcb6ce6),
+            ],
           ),
         ),
         child: SafeArea(
-          child: Stack(
+          child: Column(
             children: [
-              // Top texts
-              Align(
-                alignment: Alignment.topCenter,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 28.0, vertical: 36.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      Text(
-                        'Your Health\nJust a Tap Away',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 36,
-                          fontWeight: FontWeight.w700,
-                          height: 1.05,
-                          shadows: [Shadow(blurRadius: 6, color: Colors.black26, offset: Offset(0, 2))],
-                        ),
-                      ),
-                      SizedBox(height: 14),
-                      Text(
-                        'We bring you cutting-edge technology for faster, clearer, and more reliable reports — all under one roof.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(color: Colors.white70, fontSize: 14),
-                      ),
-                    ],
+              // Top Section - Texts
+              const SizedBox(height: 50),
+              const Text(
+                'Your Health',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 38,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                  letterSpacing: 3,
+                  fontFamily: 'Garet',
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Just a Tap Away',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 38,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                  letterSpacing: 3,
+                  fontFamily: 'Garet',
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 50),
+                child: Text(
+                  'We bring you cutting-edge technology for faster, clearer, and more reliable reports — all under one roof.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.2,
+                    fontFamily: 'Canva Sans',
                   ),
                 ),
               ),
 
-              // Center doctor image
-              Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: SizedBox(
-                    height: size.height * 0.52,
-                    child: Image.asset(
-                      'assets/images/doctor.png',
-                      fit: BoxFit.contain,
-                      errorBuilder: (context, error, stack) {
-                        // If the asset is not present, show a simple placeholder
-                        return Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white24,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          alignment: Alignment.center,
-                          child: const Icon(Icons.person, size: 96, color: Colors.white70),
-                        );
-                      },
+              // Center Section - Doctor Image (extends to bottom)
+              Expanded(
+                child: Stack(
+                  children: [
+                    // Doctor image positioned from bottom - full height
+                    Positioned(
+                      top: 30,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 0),
+                        child: Image.asset(
+                          'assets/images/doctor.png',
+                          fit: BoxFit.fitHeight,
+                          alignment: Alignment.bottomCenter,
+                          errorBuilder: (context, error, stack) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.person,
+                                size: 120,
+                                color: Colors.white60,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
 
-              // Bottom left pill button
-              Positioned(
-                left: 20,
-                bottom: 30,
-                child: GestureDetector(
-                  onTap: () {
-                    // Placeholder action: replace with navigation
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Get Started tapped')),
-                    );
-                  },
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF2E5778),
-                      borderRadius: BorderRadius.circular(40),
-                      boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 8, offset: Offset(0,4))],
+                    // Swipe Button overlaying at bottom
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 40,
+                      child: Center(
+                        child: _buildSwipeButton(),
+                      ),
                     ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Text(
-                          'Get Started',
-                          style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
-                        const SizedBox(width: 12),
-                        Container(
-                          width: 36,
-                          height: 36,
-                          decoration: BoxDecoration(
-                            color: Colors.white24,
-                            shape: BoxShape.circle,
-                          ),
-                          child: const Icon(Icons.arrow_forward, color: Colors.white),
-                        ),
-                      ],
-                    ),
-                  ),
+                  ],
                 ),
               ),
             ],
@@ -120,5 +177,152 @@ class LandingPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildSwipeButton() {
+    final maxDrag = _buttonWidth - _buttonHeight;
+    final progress = (_dragPosition / maxDrag).clamp(0.0, 1.0);
+    final circleSize = _buttonHeight - 10;
+
+    return Container(
+      width: _buttonWidth,
+      height: _buttonHeight,
+      decoration: BoxDecoration(
+        color: const Color(0xFF5A7DB0).withOpacity(0.85),
+        borderRadius: BorderRadius.circular(32.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Background Text
+          Positioned.fill(
+            child: Center(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: (1.0 - progress * 2.0).clamp(0.0, 1.0),
+                child: const Text(
+                  'Get Started',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
+          // Progress Fill
+          ClipRRect(
+            borderRadius: BorderRadius.circular(32.5),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              width: _dragPosition + circleSize + 5,
+              height: _buttonHeight,
+              decoration: BoxDecoration(
+                color: const Color(0xFF7A94C0).withOpacity(0.5),
+              ),
+            ),
+          ),
+
+          // Draggable Circle
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 50),
+            curve: Curves.easeOut,
+            left: _dragPosition + 5,
+            top: 5,
+            child: GestureDetector(
+              onHorizontalDragUpdate: (details) {
+                if (_isAnimating) return;
+
+                final newPosition = (_dragPosition + details.primaryDelta!)
+                    .clamp(0.0, maxDrag);
+
+                if ((newPosition - _dragPosition).abs() > 0.5) {
+                  setState(() {
+                    _dragPosition = newPosition;
+                  });
+                }
+
+                if (_dragPosition >= maxDrag * 0.75 && !_isAnimating) {
+                  _completeSwipe();
+                }
+              },
+              onHorizontalDragEnd: (details) {
+                if (_isAnimating) return;
+
+                final velocity = details.primaryVelocity ?? 0;
+                if (velocity > 500) {
+                  _completeSwipe();
+                } else if (_dragPosition < maxDrag * 0.75) {
+                  _animateToPosition(0.0);
+                }
+              },
+              onHorizontalDragCancel: () {
+                if (_isAnimating) return;
+                if (_dragPosition < maxDrag * 0.75) {
+                  _animateToPosition(0.0);
+                }
+              },
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD4DEEC),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: AnimatedRotation(
+                    duration: const Duration(milliseconds: 300),
+                    turns: progress * 0.2,
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: const Color(0xFF5A7DB0),
+                      size: 26,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _completeSwipe() {
+    if (_isAnimating) return;
+
+    final maxDrag = _buttonWidth - _buttonHeight;
+    _animateToPosition(maxDrag);
+
+    Future.delayed(const Duration(milliseconds: 350), () {
+      _animateToPosition(0.0);
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateAccountPage(),
+        ),
+      ).then((_) {
+        if (mounted) {
+          _animateToPosition(0.0);
+        }
+      });
+    });
   }
 }
