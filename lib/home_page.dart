@@ -181,8 +181,7 @@ class _HomePageState extends State<HomePage> {
                                       _isLoading ? 'Loading...' : 'Welcome Back! ',
                                       style: const TextStyle(
                                         fontSize: 20,
-                                        letterSpacing: 3,
-                                        fontFamily: 'Garet',
+                                        letterSpacing: 1,
                                         color: Color(0xFF4557AE),
                                       ),
                                     ),
@@ -199,7 +198,7 @@ class _HomePageState extends State<HomePage> {
                                       : _currentUser?['fullName'] ?? 'User',
                                   style: const TextStyle(
                                     fontSize: 25,
-                                    fontWeight: FontWeight.bold,
+                                    fontWeight: FontWeight.w500,
                                     fontFamily: 'Garet',
                                     color: Color(0xFF002c5c),
                                   ),

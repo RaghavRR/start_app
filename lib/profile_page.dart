@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -91,8 +92,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                   colors: [
-                    Color(0xFF5B6FCF),
-                    Color(0xFFA86FCF),
+                    Color(0xFF003373),
+                    Color(0xFF5697EA),
                   ],
                 ),
               ),
@@ -107,20 +108,21 @@ class _ProfilePageState extends State<ProfilePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           const SizedBox(width: 40),
-                          const Text(
+                          Text(
                             'My Profile',
-                            style: TextStyle(
-                              fontSize: 18,
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
                               fontWeight: FontWeight.w600,
                               color: Colors.white,
                             ),
                           ),
+
                           Container(
                             width: 40,
                             height: 40,
                             decoration: BoxDecoration(
                               color: Colors.white.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(10),
+                              borderRadius: BorderRadius.circular(40),
                             ),
                             child: const Icon(
                               Icons.edit_outlined,
@@ -132,7 +134,8 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ),
 
-                    const SizedBox(height: 30),
+                    const SizedBox(height: 10),
+
 
                     // Profile Picture
                     Container(
@@ -196,7 +199,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         : Text(
                       _currentUser?['fullName'] ?? 'User',
                       style: const TextStyle(
-                        fontSize: 22,
+                        fontSize: 28,
+                        fontFamily: 'Garet',
                         fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
@@ -240,7 +244,6 @@ class _ProfilePageState extends State<ProfilePage> {
               child: Column(
                 children: [
                   _buildMenuButton(
-                    icon: Icons.shopping_bag_outlined,
                     title: 'My Orders',
                     onTap: () {
                       // Navigate to orders
@@ -248,7 +251,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 16),
                   _buildMenuButton(
-                    icon: Icons.receipt_long_outlined,
                     title: 'Invoices',
                     onTap: () {
                       // Navigate to invoices
@@ -256,7 +258,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 16),
                   _buildMenuButton(
-                    icon: Icons.description_outlined,
                     title: 'Terms & Conditions',
                     onTap: () {
                       // Navigate to terms
@@ -264,7 +265,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                   const SizedBox(height: 16),
                   _buildMenuButton(
-                    icon: Icons.report_problem_outlined,
                     title: 'Report an Issue',
                     onTap: () {
                       // Navigate to report issue
@@ -316,7 +316,7 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildMenuButton({
-    required IconData icon,
+    IconData? icon,
     required String title,
     required VoidCallback onTap,
   }) {
@@ -327,40 +327,59 @@ class _ProfilePageState extends State<ProfilePage> {
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: const Color(0xFFE5E7EB),
+            color: Color(0xFF5C5B5B),
             width: 1.5,
           ),
         ),
         child: Row(
           children: [
-            Icon(
-              icon,
-              color: const Color(0xFF8B7FCF),
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF8B7FCF),
-                ),
+            // SHOW ICON ONLY IF NOT NULL
+            if (icon != null) ...[
+              Icon(
+                icon,
+                color: Color(0xFF8B7FCF),
+                size: 20,
               ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: const Color(0xFF8B7FCF),
-              size: 13,
-            ),
+              SizedBox(width: 12),
+            ],
+
+            // Title
+        Expanded(
+        child: gradientText(title),
+    ),
+
+            // REMOVE RIGHT ARROW
           ],
         ),
       ),
     );
   }
+
+  Widget gradientText(String text) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn, // IMPORTANT
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color(0xFF4A5C8C),
+          Color(0xFF7B5FCF),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: Colors.white,  // Must be white for ShaderMask
+          fontFamily: "Garet",
+        ),
+      ),
+    );
+  }
+
+
+
 
   Widget _buildBottomNavigationBar() {
     return Container(
