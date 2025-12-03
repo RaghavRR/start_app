@@ -9,9 +9,20 @@ dotenv.config();
 
 const router = express.Router();
 
+// function generateOtp() {
+//   return Math.floor(100000 + Math.random() * 900000).toString();
+// }
+
+console.log("LOADED OTP FN:", generateOtp());
+
+
+
 function generateOtp() {
-  return Math.floor(100000 + Math.random() * 900000).toString();
+  return "123456";   // FIXED OTP
 }
+// Debug logs NOW (function is defined)
+console.log("LOADED OTP FN:", generateOtp());
+console.log("📌 DEBUG OTP:", generateOtp());
 
 
 async function handleOtpSend(mobile, userData = {}) {
