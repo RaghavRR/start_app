@@ -256,6 +256,9 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
 
 
 
+    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
+  }
+
   @override
   void dispose() {
     _tabController.dispose();
@@ -395,6 +398,21 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
   }
 
 
+    return ListView(
+      padding: const EdgeInsets.all(20),
+      children: [
+        _buildAppointmentCard(
+          icon: Icons.medical_services,
+          title: 'CT Scan - Neck',
+          name: 'Abshixav Sharma',
+          date: '05th July 2025',
+          time: '05:22 PM',
+          status: 'Pending',
+        ),
+      ],
+    );
+  }
+
   Widget _buildUpcomingTab() {
     return const Center(
       child: Text(
@@ -504,6 +522,16 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Help option coming soon...')),
                       );
+                onSelected: (value) {
+                  switch (value) {
+                    case 'cancel':
+                    // Handle cancel appointment
+                      break;
+                    case 'reschedule':
+                    // Handle reschedule
+                      break;
+                    case 'help':
+                    // Handle help
                       break;
                   }
                 },

@@ -52,8 +52,66 @@ void _animateToPosition(double target) {
 
 
   @override
+  State<LandingPage> createState() => _LandingPageState();
+}
+
+class _LandingPageState extends State<LandingPage>
+    with SingleTickerProviderStateMixin {
+  double _dragPosition = 0.0;
+  final double _buttonWidth = 300.0;
+  final double _buttonHeight = 65.0;
+  late AnimationController _animationController;
+  late Animation<double> _positionAnimation;
+  bool _isAnimating = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    _dragPosition = 0.0;
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _animateToPosition(double targetPosition) {
+    if (_isAnimating) return;
+
+    _isAnimating = true;
+    _positionAnimation = Tween<double>(
+      begin: _dragPosition,
+      end: targetPosition,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.fastOutSlowIn,
+    ));
+
+    _animationController
+      ..reset()
+      ..forward().then((_) {
+        _isAnimating = false;
+        if (targetPosition == 0.0) {
+          setState(() {
+            _dragPosition = 0.0;
+          });
+        }
+      });
+
+    _positionAnimation.addListener(() {
+      setState(() {
+        _dragPosition = _positionAnimation.value;
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -66,7 +124,7 @@ void _animateToPosition(double target) {
           ),
         ),
         child: SafeArea(
-          child: Stack(
+          child: Column(
             children: [
               // Top texts
               Positioned(
@@ -114,6 +172,12 @@ void _animateToPosition(double target) {
                   ],
                 ),
               ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 
               // Center doctor image
               Positioned(
@@ -139,6 +203,34 @@ void _animateToPosition(double target) {
                   ),
                 ),
               ),
+            ),
+          ),
+
+          // Progress Fill
+          ClipRRect(
+            borderRadius: BorderRadius.circular(32.5),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 100),
+              width: _dragPosition + circleSize + 5,
+              height: _buttonHeight,
+              decoration: BoxDecoration(
+                color: const Color(0xFF7A94C0).withOpacity(0.5),
+              ),
+            ),
+          ),
+
+          // Draggable Circle
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 50),
+            curve: Curves.easeOut,
+            left: _dragPosition + 5,
+            top: 5,
+            child: GestureDetector(
+              onHorizontalDragUpdate: (details) {
+                if (_isAnimating) return;
+
+                final newPosition = (_dragPosition + details.primaryDelta!)
+                    .clamp(0.0, maxDrag);
 
               // Bottom swipe button
               Positioned(
@@ -149,9 +241,9 @@ void _animateToPosition(double target) {
                   child: _buildSwipeButton(),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

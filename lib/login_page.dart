@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
 
+const bool enableTestData = true;
+
+
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -23,6 +26,20 @@ class _LoginPageState extends State<LoginPage> {
     _otpController.dispose();
     super.dispose();
   }
+  // @override
+  // void dispose() {
+  //   _phoneController.dispose();
+  //   _otpController.dispose();
+  //   super.dispose();
+  // }
+  @override
+void initState() {
+  super.initState();
+  if (enableTestData) {
+    _phoneController.text = "9999999999";   // DEFAULT NUMBER
+  }
+}
+
 
   Future<void> _sendOtp() async {
     if (_phoneController.text.isEmpty || _phoneController.text.length != 10) {
@@ -54,6 +71,36 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
       }
+      // if (response['ok'] == true) {
+      //   setState(() {
+      //     _otpSent = true;
+      //     _mobileNumber = _phoneController.text.trim();
+      //   });
+      //   ScaffoldMessenger.of(context).showSnackBar(
+      //     SnackBar(
+      //       content: Text(response['msg'] ?? 'OTP sent successfully'),
+      //       backgroundColor: Colors.green,
+      //     ),
+      //   );
+      // }
+      if (response['ok'] == true) {
+  setState(() {
+    _otpSent = true;
+    _mobileNumber = _phoneController.text.trim();
+
+    if (enableTestData) {
+      _otpController.text = "123456";   // DEFAULT OTP HERE
+    }
+  });
+
+  ScaffoldMessenger.of(context).showSnackBar(
+    SnackBar(
+      content: Text(response['msg'] ?? 'OTP sent successfully'),
+      backgroundColor: Colors.green,
+    ),
+  );
+}
+
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

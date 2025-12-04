@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'auth_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
@@ -171,6 +172,108 @@ class _ProfilePageState extends State<ProfilePage> {
                           style: const TextStyle(
                             fontSize: 36,
                             fontWeight: FontWeight.bold,
+      backgroundColor: Colors.white,
+      body: Column(
+        children: [
+          // Top gradient section with profile
+          ClipRRect(
+            borderRadius: const BorderRadius.only(
+              bottomLeft: Radius.circular(30),
+              bottomRight: Radius.circular(30),
+            ),
+            child: Container(
+              width: double.infinity,
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Color(0xFF003373),
+                    Color(0xFF5697EA),
+                  ],
+                ),
+              ),
+              child: SafeArea(
+                bottom: false,
+                child: Column(
+                  children: [
+                    // Header with title and edit icon
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(width: 40),
+                          Text(
+                            'My Profile',
+                            style: GoogleFonts.poppins(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              borderRadius: BorderRadius.circular(40),
+                            ),
+                            child: const Icon(
+                              Icons.edit_outlined,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 10),
+
+
+                    // Profile Picture
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.3),
+                          width: 2,
+                        ),
+                      ),
+                      child: ClipOval(
+                        child: _isLoading
+                            ? Container(
+                          color: Colors.white.withOpacity(0.15),
+                          child: const Center(
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          ),
+                        )
+                            : _currentUser != null
+                            ? Container(
+                          color: Colors.white.withOpacity(0.15),
+                          child: Center(
+                            child: Text(
+                              _getUserInitials(_currentUser!['fullName'] ?? 'User'),
+                              style: const TextStyle(
+                                fontSize: 36,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                            : Container(
+                          color: Colors.white.withOpacity(0.15),
+                          child: const Icon(
+                            Icons.person,
+                            size: 45,
                             color: Colors.white,
                           ),
                         ),
@@ -293,6 +396,131 @@ class _ProfilePageState extends State<ProfilePage> {
                   ),
                 ),
               ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Name
+                    _isLoading
+                        ? Container(
+                      width: 140,
+                      height: 18,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(9),
+                      ),
+                    )
+                        : Text(
+                      _currentUser?['fullName'] ?? 'User',
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontFamily: 'Garet',
+                        fontWeight: FontWeight.w600,
+                        color: Colors.white,
+                      ),
+                    ),
+
+                    const SizedBox(height: 4),
+
+                    // Email
+                    _isLoading
+                        ? Container(
+                      width: 160,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(7),
+                      ),
+                    )
+                        : _currentUser != null
+                        ? Text(
+                      _currentUser?['email'] ?? _currentUser?['mobile'] ?? 'No contact info',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: Colors.white,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    )
+                        : const SizedBox(),
+
+                    const SizedBox(height: 40),
+                  ],
+                ),
+              ),
+            ),
+          ),
+
+          // Menu Options
+          Expanded(
+            child: Container(
+              color: Colors.white,
+              padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
+              child: Column(
+                children: [
+                  _buildMenuButton(
+                    title: 'My Orders',
+                    onTap: () {
+                      // Navigate to orders
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildMenuButton(
+                    title: 'Invoices',
+                    onTap: () {
+                      // Navigate to invoices
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildMenuButton(
+                    title: 'Terms & Conditions',
+                    onTap: () {
+                      // Navigate to terms
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  _buildMenuButton(
+                    title: 'Report an Issue',
+                    onTap: () {
+                      // Navigate to report issue
+                    },
+                  ),
+                  const Spacer(),
+                  // Version info
+                  Column(
+                    children: [
+                      Text(
+                        'Version 3.0',
+                        style: TextStyle(
+                          fontSize: 11,
+                          color: Colors.grey[400],
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 2),
+                      RichText(
+                        text: TextSpan(
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: Colors.grey[500],
+                            fontWeight: FontWeight.w400,
+                          ),
+                          children: const [
+                            TextSpan(text: 'Developed By '),
+                            TextSpan(
+                              text: 'Xcentic Technologies',
+                              style: TextStyle(
+                                color: Color(0xFF9D6FCF),
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
         ],
@@ -306,6 +534,9 @@ class _ProfilePageState extends State<ProfilePage> {
     required String title,
     required VoidCallback onTap,
     bool isLogout = false,
+    IconData? icon,
+    required String title,
+    required VoidCallback onTap,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -355,6 +586,63 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(
+            color: Color(0xFF5C5B5B),
+            width: 1.5,
+          ),
+        ),
+        child: Row(
+          children: [
+            // SHOW ICON ONLY IF NOT NULL
+            if (icon != null) ...[
+              Icon(
+                icon,
+                color: Color(0xFF8B7FCF),
+                size: 20,
+              ),
+              SizedBox(width: 12),
+            ],
+
+            // Title
+        Expanded(
+        child: gradientText(title),
+    ),
+
+            // REMOVE RIGHT ARROW
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget gradientText(String text) {
+    return ShaderMask(
+      blendMode: BlendMode.srcIn, // IMPORTANT
+      shaderCallback: (bounds) => const LinearGradient(
+        colors: [
+          Color(0xFF4A5C8C),
+          Color(0xFF7B5FCF),
+        ],
+      ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+          color: Colors.white,  // Must be white for ShaderMask
+          fontFamily: "Garet",
+        ),
+      ),
+    );
+  }
+
+
+
 
   Widget _buildBottomNavigationBar() {
     return Container(
@@ -453,6 +741,8 @@ class _ProfilePageState extends State<ProfilePage> {
                   ],
                 ),
                 child: const Icon(Icons.shopping_cart_outlined, size: 24, color: Colors.white),
+                child: const Icon(Icons.shopping_cart_outlined,
+                    size: 24, color: Colors.white),
               ),
               label: '',
             ),

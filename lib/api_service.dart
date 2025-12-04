@@ -4,13 +4,14 @@ import 'package:http/http.dart' as http;
 class ApiService {
   static const String baseUrl = "https://start-app-u8sb.onrender.com";
 
+  // ------------------ POST REQUEST ------------------
   static Future<Map<String, dynamic>> postRequest(
     String endpoint,
     Map<String, dynamic> body, {
     String? token,
   }) async {
     try {
-      print('🔗 POST: $baseUrl$endpoint');
+      print('🔗 API Call: $baseUrl$endpoint');
       print('📤 Request Body: $body');
 
       final response = await http.post(
@@ -23,10 +24,11 @@ class ApiService {
         body: jsonEncode(body),
       );
 
-      print('📥 Status: ${response.statusCode}');
-      print('📥 Body: ${response.body}');
+      print('📥 Response Status: ${response.statusCode}');
+      print('📥 Response Body: ${response.body}');
 
-      final responseBody = response.body.isNotEmpty ? jsonDecode(response.body) : {};
+      final responseBody =
+          response.body.isNotEmpty ? jsonDecode(response.body) : {};
 
       if (response.statusCode == 200 || response.statusCode == 201) {
         return responseBody;
@@ -45,6 +47,7 @@ class ApiService {
     }
   }
 
+  // ------------------ GET REQUEST ------------------
   static Future<Map<String, dynamic>> getRequest(
     String endpoint, {
     String? token,
@@ -63,7 +66,8 @@ class ApiService {
       print('📥 Status: ${response.statusCode}');
       print('📥 Body: ${response.body}');
 
-      final responseBody = response.body.isNotEmpty ? jsonDecode(response.body) : {};
+      final responseBody =
+          response.body.isNotEmpty ? jsonDecode(response.body) : {};
 
       if (response.statusCode == 200) {
         return responseBody;
@@ -76,6 +80,7 @@ class ApiService {
     }
   }
 
+  // ------------------ PUT REQUEST ------------------
   static Future<Map<String, dynamic>> putRequest(
     String endpoint,
     Map<String, dynamic> body, {
@@ -98,7 +103,8 @@ class ApiService {
       print('📥 Status: ${response.statusCode}');
       print('📥 Body: ${response.body}');
 
-      final responseBody = response.body.isNotEmpty ? jsonDecode(response.body) : {};
+      final responseBody =
+          response.body.isNotEmpty ? jsonDecode(response.body) : {};
 
       if (response.statusCode == 200) {
         return responseBody;
@@ -111,6 +117,7 @@ class ApiService {
     }
   }
 
+  // ------------------ DELETE REQUEST ------------------
   static Future<Map<String, dynamic>> deleteRequest(
     String endpoint, {
     String? token,
@@ -129,7 +136,8 @@ class ApiService {
       print('📥 Status: ${response.statusCode}');
       print('📥 Body: ${response.body}');
 
-      final responseBody = response.body.isNotEmpty ? jsonDecode(response.body) : {};
+      final responseBody =
+          response.body.isNotEmpty ? jsonDecode(response.body) : {};
 
       if (response.statusCode == 200) {
         return responseBody;
@@ -142,7 +150,7 @@ class ApiService {
     }
   }
 
-  
+  // ------------------ AUTH APIs ------------------
 
   static Future<Map<String, dynamic>> signUp({
     required String fullName,
@@ -171,6 +179,8 @@ class ApiService {
       'otp': otp,
     });
   }
+
+  // ------------------ APPOINTMENT APIs ------------------
 
   static Future<Map<String, dynamic>> createAppointment({
     required String token,
