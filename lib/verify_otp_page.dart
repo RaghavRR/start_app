@@ -46,6 +46,60 @@ class _VerifyOTPPageState extends State<VerifyOTPPage> {
     return _otpControllers.map((c) => c.text).join();
   }
 
+  Future<void> _handleVerifyOTP() async {
+    final otp = _getOTP();
+
+    if (otp.length != 6) {
+      _showError('Please enter complete OTP');
+      return;
+    }
+
+    if (_mobile == null) {
+      _showError('Mobile number not found');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      // Call API - Uncomment when ApiService is imported
+      /*
+      final result = await ApiService.verifyOTP(
+        mobile: _mobile!,
+        otp: otp,
+      );
+
+      if (result['success']) {
+        // Navigate to home page
+        Navigator.pushNamedAndRemoveUntil(
+          context,
+          '/home',
+          (route) => false,
+        );
+      } else {
+        _showError(result['error']);
+      }
+      */
+
+      // Mock implementation for demo
+      await Future.delayed(const Duration(seconds: 2));
+
+      // Simulate success
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        '/home',
+            (route) => false,
+      );
+    } catch (e) {
+      _showError('Something went wrong. Please try again.');
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
 Future<void> _handleVerifyOTP() async {
   final otp = _getOTP();
 

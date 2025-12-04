@@ -20,6 +20,12 @@ class _LoginPageState extends State<LoginPage> {
   bool _otpSent = false;
   String? _mobileNumber;
 
+  @override
+  void dispose() {
+    _phoneController.dispose();
+    _otpController.dispose();
+    super.dispose();
+  }
   // @override
   // void dispose() {
   //   _phoneController.dispose();
@@ -53,6 +59,18 @@ void initState() {
     try {
       final response = await ApiService.signIn(_phoneController.text.trim());
 
+      if (response['ok'] == true) {
+        setState(() {
+          _otpSent = true;
+          _mobileNumber = _phoneController.text.trim();
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['msg'] ?? 'OTP sent successfully'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
       // if (response['ok'] == true) {
       //   setState(() {
       //     _otpSent = true;

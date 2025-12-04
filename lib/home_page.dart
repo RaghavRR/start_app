@@ -14,7 +14,7 @@ class _HomePageState extends State<HomePage> {
   Map<String, dynamic>? _currentUser;
   bool _isLoading = true;
 
-  // Mock data - Replace with API calls (keep as network images)
+  // Mock data - Replace with API calls
   final List<Map<String, dynamic>> banners = [
     {
       'image': 'https://via.placeholder.com/400x200/4A90E2/FFFFFF?text=Star+Radiology',
@@ -94,295 +94,295 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F7),
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            // Background Image from local assets - FULL SCREEN
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/home_bg.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: const Color(0xFFF8FAFF),
-                  );
-                },
+            // Header Section
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [Color(0xFFE8E8F5), Color(0xFFF0E8F5)],
+                ),
               ),
-            ),
-
-            // Content - FULL SCREEN
-            Column(
-              children: [
-                // Header Section - REMOVED the gradient background
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  // REMOVED the gradient decoration to show background image
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Welcome message and notification
+                  Row(
                     children: [
-                      // Welcome message and notification
-                      Row(
-                        children: [
-                          // Avatar with user initials
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: const Color(0xFF6366F1),
-                                width: 2,
-                              ),
-                            ),
-                            child: ClipOval(
-                              child: _isLoading
-                                  ? Container(
-                                color: const Color(0xFF6366F1).withOpacity(0.2),
-                                child: const Center(
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
-                                  ),
-                                ),
-                              )
-                                  : _currentUser != null
-                                  ? Container(
-                                color: const Color(0xFF6366F1),
-                                child: Center(
-                                  child: Text(
-                                    _getUserInitials(_currentUser!['fullName'] ?? 'User'),
-                                    style: const TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ),
-                              )
-                                  : Container(
-                                color: const Color(0xFF6366F1).withOpacity(0.2),
-                                child: const Icon(
-                                  Icons.person,
-                                  color: Color(0xFF6366F1),
-                                  size: 30,
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          // Welcome text with user data
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Text(
-                                      _isLoading ? 'Loading...' : 'Welcome Back! ',
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                        letterSpacing: 1,
-                                        color: Color(0xFF4557AE),
-                                      ),
-                                    ),
-                                    if (!_isLoading)
-                                      const Text(
-                                        '👋',
-                                        style: TextStyle(fontSize: 20),
-                                      ),
-                                  ],
-                                ),
-                                Text(
-                                  _isLoading
-                                      ? 'Loading...'
-                                      : _currentUser?['fullName'] ?? 'User',
-                                  style: const TextStyle(
-                                    fontSize: 25,
-                                    fontWeight: FontWeight.w500,
-                                    fontFamily: 'Garet',
-                                    color: Color(0xFF002c5c),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          // Notification bell
-                          Container(
-                            padding: const EdgeInsets.all(10),
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              shape: BoxShape.circle,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.05),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
-                            ),
-                            child: const Icon(
-                              Icons.notifications_outlined,
-                              color: Color(0xFF6366F1),
-                              size: 20,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
-
-                      // Search bar
+                      // Avatar with user initials
                       Container(
+                        width: 50,
+                        height: 50,
                         decoration: BoxDecoration(
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(25),
+                          shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.black,
-                            width: 1.2,
+                            color: const Color(0xFF6366F1),
+                            width: 2,
                           ),
                         ),
-                        child: TextField(
-                          controller: _searchController,
-                          decoration: InputDecoration(
-                            hintText: 'Find your Labs, Tests...',
-                            hintStyle: const TextStyle(
-                              color: Color(0xFF9CA3AF),
-                              fontSize: 14,
+                        child: ClipOval(
+                          child: _isLoading
+                              ? Container(
+                            color: const Color(0xFF6366F1).withOpacity(0.2),
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+                              ),
                             ),
-                            prefixIcon: const Icon(
-                              Icons.search,
-                              color: Color(0xFF6B7280),
-                            ),
-                            suffixIcon: Container(
-                              margin: const EdgeInsets.all(8),
-                              padding: const EdgeInsets.all(8),
-                              decoration: BoxDecoration(
-                                gradient: const LinearGradient(
-                                  colors: [Color(0xFFC3C3E4), Color(0xFFC3C3E4)],
+                          )
+                              : _currentUser != null
+                              ? Container(
+                            color: const Color(0xFF6366F1),
+                            child: Center(
+                              child: Text(
+                                _getUserInitials(_currentUser!['fullName'] ?? 'User'),
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
                                 ),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: const Icon(
-                                Icons.tune,
-                                color: Color(0xFF3937a7),
-                                size: 20,
                               ),
                             ),
-                            border: InputBorder.none,
-                            contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 14,
+                          )
+                              : Container(
+                            color: const Color(0xFF6366F1).withOpacity(0.2),
+                            child: const Icon(
+                              Icons.person,
+                              color: Color(0xFF6366F1),
+                              size: 30,
                             ),
-                            filled: true,
-                            fillColor: Colors.transparent,
                           ),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      // Welcome text with user data
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Text(
+                                  _isLoading ? 'Loading...' : 'Welcome Back! ',
+                                  style: const TextStyle(
+                                    fontSize: 15,
+                                    color: Color(0xFF6B7280),
+                                  ),
+                                ),
+                                if (!_isLoading)
+                                  const Text(
+                                    '👋',
+                                    style: TextStyle(fontSize: 15),
+                                  ),
+                              ],
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              _isLoading
+                                  ? 'Loading...'
+                                  : _currentUser?['fullName'] ?? 'User',
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1F2937),
+                              ),
+                            ),
+                            if (_currentUser != null && _currentUser!['mobile'] != null)
+                              const SizedBox(height: 2),
+                            if (_currentUser != null && _currentUser!['mobile'] != null)
+                              Text(
+                                _currentUser!['mobile'],
+                                style: const TextStyle(
+                                  fontSize: 12,
+                                  color: Color(0xFF6B7280),
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
+                      // Notification bell
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.05),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.notifications_outlined,
+                          color: Color(0xFF6366F1),
+                          size: 24,
                         ),
                       ),
                     ],
                   ),
-                ),
+                  const SizedBox(height: 16),
 
-                // Scrollable content - EXPAND TO FILL REMAINING SPACE
-                Expanded(
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.only(bottom: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 20),
-
-                        // Banner Carousel
-                        SizedBox(
-                          height: 180,
-                          child: ListView.builder(
-                            scrollDirection: Axis.horizontal,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            itemCount: banners.length,
-                            itemBuilder: (context, index) {
-                              final banner = banners[index];
-                              return Container(
-                                width: MediaQuery.of(context).size.width - 40,
-                                margin: EdgeInsets.only(
-                                  right: index < banners.length - 1 ? 16 : 0,
-                                ),
-                                child: _buildBannerCard(
-                                  banner['image'],
-                                  banner['title'],
-                                  banner['subtitle'],
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        // Test Categories Grid
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: GridView.builder(
-                            shrinkWrap: true,
-                            physics: const NeverScrollableScrollPhysics(),
-                            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 4,
-                              crossAxisSpacing: 12,
-                              mainAxisSpacing: 12,
-                              childAspectRatio: 0.85,
-                            ),
-                            itemCount: testCategories.length,
-                            itemBuilder: (context, index) {
-                              final category = testCategories[index];
-                              return _buildTestCategoryCard(
-                                category['name'],
-                                category['image'],
-                              );
-                            },
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Book a Test and Find Center Buttons
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: Row(
-                            children: [
-                              Expanded(
-                                child: _buildActionButton(
-                                  'Book A Test',
-                                  Icons.event_available,
-                                  const Color(0xFF4A5C8C),
-                                      () {
-                                    Navigator.pushNamed(context, '/book-appointment');
-                                  },
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Expanded(
-                                child: _buildActionButton(
-                                  'Find your\nNearest center',
-                                  Icons.location_on_outlined,
-                                  const Color(0xFF4A5C8C),
-                                      () {
-                                    // Navigate to find center
-                                  },
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 20),
-
-                        // Promo Banner
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          child: _buildPromoBanner(),
+                  // Search bar
+                  Container(
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(12),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 2),
                         ),
                       ],
                     ),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Find your Labs, Tests...',
+                        hintStyle: const TextStyle(
+                          color: Color(0xFF9CA3AF),
+                          fontSize: 14,
+                        ),
+                        prefixIcon: const Icon(
+                          Icons.search,
+                          color: Color(0xFF6B7280),
+                        ),
+                        suffixIcon: Container(
+                          margin: const EdgeInsets.all(8),
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            gradient: const LinearGradient(
+                              colors: [Color(0xFF6366F1), Color(0xFF8B5FCF)],
+                            ),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: const Icon(
+                            Icons.tune,
+                            color: Colors.white,
+                            size: 20,
+                          ),
+                        ),
+                        border: InputBorder.none,
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 14,
+                        ),
+                      ),
+                    ),
                   ),
+                ],
+              ),
+            ),
+
+            // Scrollable content
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 20),
+
+                    // Banner Carousel
+                    SizedBox(
+                      height: 180,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        itemCount: banners.length,
+                        itemBuilder: (context, index) {
+                          final banner = banners[index];
+                          return Container(
+                            width: MediaQuery.of(context).size.width - 40,
+                            margin: EdgeInsets.only(
+                              right: index < banners.length - 1 ? 16 : 0,
+                            ),
+                            child: _buildBannerCard(
+                              banner['image'],
+                              banner['title'],
+                              banner['subtitle'],
+                            ),
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 24),
+
+                    // Test Categories Grid
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 4,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
+                          childAspectRatio: 0.85,
+                        ),
+                        itemCount: testCategories.length,
+                        itemBuilder: (context, index) {
+                          final category = testCategories[index];
+                          return _buildTestCategoryCard(
+                            category['name'],
+                            category['image'],
+                          );
+                        },
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Book a Test and Find Center Buttons
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _buildActionButton(
+                              'Book A Test',
+                              Icons.event_available,
+                              const Color(0xFF4A5C8C),
+                                  () {
+                                // Navigate to book test
+                                Navigator.pushNamed(context, '/book-appointment');
+                              },
+                            ),
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: _buildActionButton(
+                              'Find your\nNearest center',
+                              Icons.location_on_outlined,
+                              const Color(0xFF4A5C8C),
+                                  () {
+                                // Navigate to find center
+                              },
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Promo Banner
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: _buildPromoBanner(),
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ],
         ),
@@ -717,16 +717,19 @@ class _HomePageState extends State<HomePage> {
             });
             switch (index) {
               case 0:
+              // Already on Home
                 break;
               case 1:
-                Navigator.pushNamed(context, '/appointments');
+                Navigator.pushNamed(context, '/appointments'); // CHANGED
                 break;
               case 2:
+              // Navigate to Cart
                 break;
               case 3:
+              // Navigate to Reports
                 break;
               case 4:
-                Navigator.pushNamed(context, '/profile');
+                Navigator.pushNamed(context, '/profile'); // CHANGED
                 break;
             }
           },
@@ -737,7 +740,7 @@ class _HomePageState extends State<HomePage> {
           selectedFontSize: 12,
           unselectedFontSize: 12,
           selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-          items: [
+   items: [
             BottomNavigationBarItem(
               icon: Container(
                 padding: const EdgeInsets.all(8),

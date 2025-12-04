@@ -76,6 +76,102 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      body: Stack(
+        children: [
+          // Background with wave pattern
+          Container(
+            height: MediaQuery.of(context).size.height * 0.45,
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color(0xFF3B5998),
+                  Color(0xFF8B5FCF),
+                ],
+              ),
+            ),
+            child: CustomPaint(
+              painter: WavePainter(),
+              child: Container(),
+            ),
+          ),
+
+          // Content
+          SafeArea(
+            child: Column(
+              children: [
+                // Header with title and edit icon
+                Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Spacer(),
+                      const Text(
+                        'My Profile',
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Icon(
+                          Icons.edit_outlined,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 20),
+
+                // Profile Picture with User Initials
+                Container(
+                  width: 120,
+                  height: 120,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: Colors.white,
+                      width: 4,
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.2),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
+                  ),
+                  child: ClipOval(
+                    child: _isLoading
+                        ? Container(
+                      color: Colors.grey[300],
+                      child: const Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF6366F1),
+                        ),
+                      ),
+                    )
+                        : _currentUser != null
+                        ? Container(
+                      color: const Color(0xFF6366F1),
+                      child: Center(
+                        child: Text(
+                          _getUserInitials(_currentUser!['fullName'] ?? 'User'),
+                          style: const TextStyle(
+                            fontSize: 36,
+                            fontWeight: FontWeight.bold,
       backgroundColor: Colors.white,
       body: Column(
         children: [
@@ -182,6 +278,124 @@ class _ProfilePageState extends State<ProfilePage> {
                           ),
                         ),
                       ),
+                    )
+                        : Container(
+                      color: Colors.grey[300],
+                      child: const Icon(
+                        Icons.person,
+                        size: 60,
+                        color: Colors.grey,
+                      ),
+                    ),
+                  ),
+                ),
+
+                const SizedBox(height: 16),
+
+                // Name
+                _isLoading
+                    ? const CircularProgressIndicator(
+                  color: Colors.white,
+                  strokeWidth: 2,
+                )
+                    : Text(
+                  _currentUser?['fullName'] ?? 'User',
+                  style: const TextStyle(
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+
+                const SizedBox(height: 4),
+
+                // Email or Mobile
+                _currentUser != null
+                    ? Text(
+                  _currentUser?['email'] ?? _currentUser?['mobile'] ?? 'No contact info',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.white70,
+                  ),
+                )
+                    : const SizedBox(),
+
+                const SizedBox(height: 30),
+
+                // Menu Options
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 30),
+                    child: Column(
+                      children: [
+                        _buildMenuButton(
+                          icon: Icons.shopping_bag_outlined,
+                          title: 'My Orders',
+                          onTap: () {
+                            // Navigate to orders
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          icon: Icons.description_outlined,
+                          title: 'Terms & Conditions',
+                          onTap: () {
+                            // Navigate to terms
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          icon: Icons.report_problem_outlined,
+                          title: 'Report an Issue',
+                          onTap: () {
+                            // Navigate to report issue
+                          },
+                        ),
+                        const SizedBox(height: 16),
+                        _buildMenuButton(
+                          icon: Icons.logout_outlined,
+                          title: 'Sign Out',
+                          onTap: _logout,
+                          isLogout: true,
+                        ),
+                        const Spacer(),
+                        // Version info
+                        Column(
+                          children: [
+                            Text(
+                              'Version 3.0',
+                              style: TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey[400],
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            RichText(
+                              text: TextSpan(
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  color: Colors.grey[500],
+                                ),
+                                children: const [
+                                  TextSpan(text: 'Developed By '),
+                                  TextSpan(
+                                    text: 'Xcentic Technologies',
+                                    style: TextStyle(
+                                      color: Color(0xFF6366F1),
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
                     ),
 
                     const SizedBox(height: 16),
@@ -316,6 +530,10 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildMenuButton({
+    required IconData icon,
+    required String title,
+    required VoidCallback onTap,
+    bool isLogout = false,
     IconData? icon,
     required String title,
     required VoidCallback onTap,
@@ -324,6 +542,51 @@ class _ProfilePageState extends State<ProfilePage> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: const Color(0xFFE5E7EB),
+            width: 1.5,
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.03),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Row(
+          children: [
+            Icon(
+              icon,
+              color: isLogout ? Colors.red : const Color(0xFF6366F1),
+              size: 20,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  fontSize: 15,
+                  fontWeight: FontWeight.w500,
+                  color: isLogout ? Colors.red : const Color(0xFF6366F1),
+                ),
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios_rounded,
+              color: isLogout ? Colors.red : const Color(0xFF6366F1),
+              size: 16,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -477,6 +740,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
                 ),
+                child: const Icon(Icons.shopping_cart_outlined, size: 24, color: Colors.white),
                 child: const Icon(Icons.shopping_cart_outlined,
                     size: 24, color: Colors.white),
               ),
@@ -513,4 +777,37 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
+}
+
+class WavePainter extends CustomPainter {
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = Colors.white.withOpacity(0.1)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2;
+
+    // Draw multiple wave lines
+    for (int i = 0; i < 6; i++) {
+      final path = Path();
+      final yOffset = size.height * 0.3 + (i * 20.0);
+
+      path.moveTo(0, yOffset);
+
+      for (double x = 0; x <= size.width; x += 20) {
+        final y = yOffset + (10 * (i % 2 == 0 ? 1 : -1));
+        path.quadraticBezierTo(
+          x,
+          y,
+          x + 20,
+          yOffset,
+        );
+      }
+
+      canvas.drawPath(path, paint);
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
