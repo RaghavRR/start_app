@@ -2,54 +2,7 @@ import 'package:flutter/material.dart';
 import 'create_account_page.dart';
 
 class LandingPage extends StatefulWidget {
-  const LandingPage({super.key});
-
-  @override
-  State<LandingPage> createState() => _LandingPageState();
-}
-
-class _LandingPageState extends State<LandingPage>
-    with SingleTickerProviderStateMixin {
-  double _dragPosition = 0.0;
-  final double _buttonWidth = 280.0;
-  final double _buttonHeight = 70.0;
-  late AnimationController _animationController;
-  late Animation<double> _positionAnimation;
-  bool _isAnimating = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 300),
-    );
-    _dragPosition = 0.0;
-  }
-
-  @override
-  void dispose() {
-    _animationController.dispose();
-    super.dispose();
-  }
-
-void _animateToPosition(double target) {
-  final maxDrag = _buttonWidth - _buttonHeight;
-
-  _positionAnimation = Tween<double>(
-    begin: _dragPosition,
-    end: target,
-  ).animate(_animationController);
-
-  _animationController
-    ..reset()
-    ..forward();
-
-  _positionAnimation.addListener(() {
-    setState(() => _dragPosition = _positionAnimation.value);
-  });
-}
-
+  const LandingPage({Key? key}) : super(key: key);
 
   @override
   State<LandingPage> createState() => _LandingPageState();
@@ -118,55 +71,102 @@ class _LandingPageState extends State<LandingPage>
         height: double.infinity,
         decoration: const BoxDecoration(
           gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF234A91), Color(0xFF9370DB)],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF003373),
+              Color(0xFFcb6ce6),
+            ],
           ),
         ),
         child: SafeArea(
           child: Column(
             children: [
-              // Top texts
-              Positioned(
-                top: 40,
-                left: 0,
-                right: 0,
-                child: Column(
-                  children: const [
-                    Text(
-                      'Your Health',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        height: 1.1,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    Text(
-                      'Just a Tap Away',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        height: 1.1,
-                        letterSpacing: 0.3,
-                      ),
-                    ),
-                    SizedBox(height: 16),
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 32),
-                      child: Text(
-                        'We bring you cutting-edge technology for faster, clearer, and more reliable reports — all under one roof.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 13,
-                          height: 1.5,
-                          fontWeight: FontWeight.w400,
+              // Top Section - Texts
+              const SizedBox(height: 50),
+              const Text(
+                'Your Health',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 38,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                  letterSpacing: 3,
+                  fontFamily: 'Garet',
+                ),
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Just a Tap Away',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 38,
+                  fontWeight: FontWeight.w800,
+                  height: 1.15,
+                  letterSpacing: 3,
+                  fontFamily: 'Garet',
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 50),
+                child: Text(
+                  'We bring you cutting-edge technology for faster, clearer, and more reliable reports — all under one roof.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    height: 1.5,
+                    fontWeight: FontWeight.w400,
+                    letterSpacing: 0.2,
+                    fontFamily: 'Canva Sans',
+                  ),
+                ),
+              ),
+
+              // Center Section - Doctor Image (extends to bottom)
+              Expanded(
+                child: Stack(
+                  children: [
+                    // Doctor image positioned from bottom - full height
+                    Positioned(
+                      top: 30,
+                      bottom: 0,
+                      left: 0,
+                      right: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 0),
+                        child: Image.asset(
+                          'assets/images/doctor.png',
+                          fit: BoxFit.fitHeight,
+                          alignment: Alignment.bottomCenter,
+                          errorBuilder: (context, error, stack) {
+                            return Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Icon(
+                                Icons.person,
+                                size: 120,
+                                color: Colors.white60,
+                              ),
+                            );
+                          },
                         ),
+                      ),
+                    ),
+
+                    // Swipe Button overlaying at bottom
+                    Positioned(
+                      left: 0,
+                      right: 0,
+                      bottom: 40,
+                      child: Center(
+                        child: _buildSwipeButton(),
                       ),
                     ),
                   ],
@@ -179,27 +179,40 @@ class _LandingPageState extends State<LandingPage>
     );
   }
 
-              // Center doctor image
-              Positioned(
-                top: 160,
-                bottom: 150,
-                left: 0,
-                right: 0,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24.0),
-                  child: Image.asset(
-                    'assets/images/doctor.png',
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stack) {
-                      return Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(200),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Icon(Icons.person, size: 100, color: Colors.white60),
-                      );
-                    },
+  Widget _buildSwipeButton() {
+    final maxDrag = _buttonWidth - _buttonHeight;
+    final progress = (_dragPosition / maxDrag).clamp(0.0, 1.0);
+    final circleSize = _buttonHeight - 10;
+
+    return Container(
+      width: _buttonWidth,
+      height: _buttonHeight,
+      decoration: BoxDecoration(
+        color: const Color(0xFF5A7DB0).withOpacity(0.85),
+        borderRadius: BorderRadius.circular(32.5),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.25),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Background Text
+          Positioned.fill(
+            child: Center(
+              child: AnimatedOpacity(
+                duration: const Duration(milliseconds: 200),
+                opacity: (1.0 - progress * 2.0).clamp(0.0, 1.0),
+                child: const Text(
+                  'Get Started',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
                   ),
                 ),
               ),
@@ -232,13 +245,56 @@ class _LandingPageState extends State<LandingPage>
                 final newPosition = (_dragPosition + details.primaryDelta!)
                     .clamp(0.0, maxDrag);
 
-              // Bottom swipe button
-              Positioned(
-                left: 0,
-                right: 0,
-                bottom: 50,
+                if ((newPosition - _dragPosition).abs() > 0.5) {
+                  setState(() {
+                    _dragPosition = newPosition;
+                  });
+                }
+
+                if (_dragPosition >= maxDrag * 0.75 && !_isAnimating) {
+                  _completeSwipe();
+                }
+              },
+              onHorizontalDragEnd: (details) {
+                if (_isAnimating) return;
+
+                final velocity = details.primaryVelocity ?? 0;
+                if (velocity > 500) {
+                  _completeSwipe();
+                } else if (_dragPosition < maxDrag * 0.75) {
+                  _animateToPosition(0.0);
+                }
+              },
+              onHorizontalDragCancel: () {
+                if (_isAnimating) return;
+                if (_dragPosition < maxDrag * 0.75) {
+                  _animateToPosition(0.0);
+                }
+              },
+              child: Container(
+                width: circleSize,
+                height: circleSize,
+                decoration: BoxDecoration(
+                  color: const Color(0xFFD4DEEC),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
+                ),
                 child: Center(
-                  child: _buildSwipeButton(),
+                  child: AnimatedRotation(
+                    duration: const Duration(milliseconds: 300),
+                    turns: progress * 0.2,
+                    child: Icon(
+                      Icons.arrow_forward_rounded,
+                      color: const Color(0xFF5A7DB0),
+                      size: 26,
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -248,121 +304,25 @@ class _LandingPageState extends State<LandingPage>
     );
   }
 
-Widget _buildSwipeButton() {
-  final maxDrag = _buttonWidth - _buttonHeight;
-  final circleSize = _buttonHeight - 8;
+  void _completeSwipe() {
+    if (_isAnimating) return;
 
-  return Container(
-    width: _buttonWidth,
-    height: _buttonHeight,
-    decoration: BoxDecoration(
-      gradient: const LinearGradient(
-        colors: [Color(0xFF3D5A80), Color(0xFF4A6FA5)],
-      ),
-      borderRadius: BorderRadius.circular(35),
-    ),
-    child: Stack(
-      children: [
-        // Background progress
-        Positioned.fill(
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 100),
-            width: _dragPosition + circleSize,
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [Color(0xFF5E7BB5), Color(0xFF6B8BC5)],
-              ),
-              borderRadius: BorderRadius.circular(35),
-            ),
-          ),
-        ),
+    final maxDrag = _buttonWidth - _buttonHeight;
+    _animateToPosition(maxDrag);
 
-        // Text (fade out)
-        Positioned.fill(
-          child: AnimatedOpacity(
-            duration: const Duration(milliseconds: 200),
-            opacity: 1 - (_dragPosition / maxDrag * 1.2).clamp(0.0, 1.0),
-            child: const Center(
-              child: Text(
-                "Get Started",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ),
-          ),
-        ),
-
-        // Draggable Button
-        AnimatedPositioned(
-          duration: const Duration(milliseconds: 0),
-          left: _dragPosition + 4,
-          top: 4,
-          child: GestureDetector(
-            onHorizontalDragUpdate: (details) {
-              final pos = (_dragPosition + details.primaryDelta!)
-                  .clamp(0.0, maxDrag);
-
-              setState(() => _dragPosition = pos);
-
-              if (pos >= maxDrag) {
-                _completeSwipe();
-              }
-            },
-
-            onHorizontalDragEnd: (_) {
-              if (_dragPosition < maxDrag * 0.8) {
-                _animateToPosition(0.0);
-              } else {
-                _completeSwipe();
-              }
-            },
-
-            child: Container(
-              width: circleSize,
-              height: circleSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: const LinearGradient(
-                  colors: [Colors.white, Colors.white70],
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.2),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
-                  )
-                ],
-              ),
-              child: const Icon(
-                Icons.arrow_forward,
-                color: Color(0xFF3D5A80),
-                size: 28,
-              ),
-            ),
-          ),
-        )
-      ],
-    ),
-  );
-}
-
-
-void _completeSwipe() {
-  final maxDrag = _buttonWidth - _buttonHeight;
-
-  _animateToPosition(maxDrag);
-
-  Future.delayed(const Duration(milliseconds: 300), () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => const CreateAccountPage()),
-    ).then((_) {
+    Future.delayed(const Duration(milliseconds: 350), () {
       _animateToPosition(0.0);
-    });
-  });
-}
 
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const CreateAccountPage(),
+        ),
+      ).then((_) {
+        if (mounted) {
+          _animateToPosition(0.0);
+        }
+      });
+    });
+  }
 }

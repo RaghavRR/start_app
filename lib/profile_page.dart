@@ -76,106 +76,10 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // Background with wave pattern
-          Container(
-            height: MediaQuery.of(context).size.height * 0.45,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [
-                  Color(0xFF3B5998),
-                  Color(0xFF8B5FCF),
-                ],
-              ),
-            ),
-            child: CustomPaint(
-              painter: WavePainter(),
-              child: Container(),
-            ),
-          ),
-
-          // Content
-          SafeArea(
-            child: Column(
-              children: [
-                // Header with title and edit icon
-                Padding(
-                  padding: const EdgeInsets.all(20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Spacer(),
-                      const Text(
-                        'My Profile',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        child: const Icon(
-                          Icons.edit_outlined,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-
-                const SizedBox(height: 20),
-
-                // Profile Picture with User Initials
-                Container(
-                  width: 120,
-                  height: 120,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: Colors.white,
-                      width: 4,
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.2),
-                        blurRadius: 10,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: ClipOval(
-                    child: _isLoading
-                        ? Container(
-                      color: Colors.grey[300],
-                      child: const Center(
-                        child: CircularProgressIndicator(
-                          color: Color(0xFF6366F1),
-                        ),
-                      ),
-                    )
-                        : _currentUser != null
-                        ? Container(
-                      color: const Color(0xFF6366F1),
-                      child: Center(
-                        child: Text(
-                          _getUserInitials(_currentUser!['fullName'] ?? 'User'),
-                          style: const TextStyle(
-                            fontSize: 36,
-                            fontWeight: FontWeight.bold,
       backgroundColor: Colors.white,
       body: Column(
         children: [
-          // Top gradient section with profile
+          // Top section with image background
           ClipRRect(
             borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(30),
@@ -183,269 +87,193 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
             child: Container(
               width: double.infinity,
-              decoration: const BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF003373),
-                    Color(0xFF5697EA),
-                  ],
-                ),
-              ),
-              child: SafeArea(
-                bottom: false,
-                child: Column(
-                  children: [
-                    // Header with title and edit icon
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const SizedBox(width: 40),
-                          Text(
-                            'My Profile',
-                            style: GoogleFonts.poppins(
-                              fontSize: 20,
-                              fontWeight: FontWeight.w600,
-                              color: Colors.white,
-                            ),
+              child: Stack(
+                children: [
+                  // Background Image
+                  Image.asset(
+                    'assets/images/profile_bg.jpg', // Change to your image path
+                    width: double.infinity,
+                    height: 320, // Adjust height as needed
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback gradient if image fails to load
+                      return Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                            colors: [
+                              Color(0xFF003373),
+                              Color(0xFF5697EA),
+                            ],
                           ),
+                        ),
+                      );
+                    },
+                  ),
 
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              color: Colors.white.withOpacity(0.15),
-                              borderRadius: BorderRadius.circular(40),
-                            ),
-                            child: const Icon(
-                              Icons.edit_outlined,
-                              color: Colors.white,
-                              size: 20,
-                            ),
-                          ),
+                  // Dark overlay for better text readability
+                  Container(
+                    width: double.infinity,
+                    height: 320,
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.3),
+                          Colors.black.withOpacity(0.6),
                         ],
                       ),
-                    ),
-
-                    const SizedBox(height: 10),
-
-
-                    // Profile Picture
-                    Container(
-                      width: 100,
-                      height: 100,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.3),
-                          width: 2,
-                        ),
+                      borderRadius: const BorderRadius.only(
+                        bottomLeft: Radius.circular(30),
+                        bottomRight: Radius.circular(30),
                       ),
-                      child: ClipOval(
-                        child: _isLoading
-                            ? Container(
-                          color: Colors.white.withOpacity(0.15),
-                          child: const Center(
-                            child: CircularProgressIndicator(
-                              color: Colors.white,
-                              strokeWidth: 2,
-                            ),
+                    ),
+                  ),
+
+                  // Content
+                  SafeArea(
+                    bottom: false,
+                    child: Column(
+                      children: [
+                        // Header with title and edit icon
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              const SizedBox(width: 40),
+                              Text(
+                                'My Profile',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              Container(
+                                width: 40,
+                                height: 40,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(40),
+                                ),
+                                child: const Icon(
+                                  Icons.edit_outlined,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                              ),
+                            ],
                           ),
-                        )
-                            : _currentUser != null
-                            ? Container(
-                          color: Colors.white.withOpacity(0.15),
-                          child: Center(
-                            child: Text(
-                              _getUserInitials(_currentUser!['fullName'] ?? 'User'),
-                              style: const TextStyle(
-                                fontSize: 36,
-                                fontWeight: FontWeight.w600,
+                        ),
+                        const SizedBox(height: 10),
+
+                        // Profile Picture
+                        Container(
+                          width: 100,
+                          height: 100,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.3),
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 10,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ClipOval(
+                            child: _isLoading
+                                ? Container(
+                              color: Colors.white.withOpacity(0.15),
+                              child: const Center(
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                            )
+                                : _currentUser != null
+                                ? Container(
+                              color: Colors.white.withOpacity(0.15),
+                              child: Center(
+                                child: Text(
+                                  _getUserInitials(
+                                      _currentUser!['fullName'] ?? 'User'),
+                                  style: const TextStyle(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            )
+                                : Container(
+                              color: Colors.white.withOpacity(0.15),
+                              child: const Icon(
+                                Icons.person,
+                                size: 45,
                                 color: Colors.white,
                               ),
                             ),
                           ),
+                        ),
+                        const SizedBox(height: 16),
+
+                        // Name
+                        _isLoading
+                            ? Container(
+                          width: 140,
+                          height: 18,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(9),
+                          ),
                         )
-                            : Container(
-                          color: Colors.white.withOpacity(0.15),
-                          child: const Icon(
-                            Icons.person,
-                            size: 45,
+                            : Text(
+                          _currentUser?['fullName'] ?? 'User',
+                          style: const TextStyle(
+                            fontSize: 28,
+                            fontFamily: 'Garet',
+                            fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
-                      ),
-                    )
-                        : Container(
-                      color: Colors.grey[300],
-                      child: const Icon(
-                        Icons.person,
-                        size: 60,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-                ),
+                        const SizedBox(height: 4),
 
-                const SizedBox(height: 16),
-
-                // Name
-                _isLoading
-                    ? const CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                )
-                    : Text(
-                  _currentUser?['fullName'] ?? 'User',
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-
-                const SizedBox(height: 4),
-
-                // Email or Mobile
-                _currentUser != null
-                    ? Text(
-                  _currentUser?['email'] ?? _currentUser?['mobile'] ?? 'No contact info',
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.white70,
-                  ),
-                )
-                    : const SizedBox(),
-
-                const SizedBox(height: 30),
-
-                // Menu Options
-                Expanded(
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 30),
-                    child: Column(
-                      children: [
-                        _buildMenuButton(
-                          icon: Icons.shopping_bag_outlined,
-                          title: 'My Orders',
-                          onTap: () {
-                            // Navigate to orders
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMenuButton(
-                          icon: Icons.description_outlined,
-                          title: 'Terms & Conditions',
-                          onTap: () {
-                            // Navigate to terms
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMenuButton(
-                          icon: Icons.report_problem_outlined,
-                          title: 'Report an Issue',
-                          onTap: () {
-                            // Navigate to report issue
-                          },
-                        ),
-                        const SizedBox(height: 16),
-                        _buildMenuButton(
-                          icon: Icons.logout_outlined,
-                          title: 'Sign Out',
-                          onTap: _logout,
-                          isLogout: true,
-                        ),
-                        const Spacer(),
-                        // Version info
-                        Column(
-                          children: [
-                            Text(
-                              'Version 3.0',
-                              style: TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey[400],
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            RichText(
-                              text: TextSpan(
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  color: Colors.grey[500],
-                                ),
-                                children: const [
-                                  TextSpan(text: 'Developed By '),
-                                  TextSpan(
-                                    text: 'Xcentic Technologies',
-                                    style: TextStyle(
-                                      color: Color(0xFF6366F1),
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 20),
+                        // Email
+                        _isLoading
+                            ? Container(
+                          width: 160,
+                          height: 14,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.3),
+                            borderRadius: BorderRadius.circular(7),
+                          ),
+                        )
+                            : _currentUser != null
+                            ? Text(
+                          _currentUser?['email'] ??
+                              _currentUser?['mobile'] ??
+                              'No contact info',
+                          style: const TextStyle(
+                            fontSize: 13,
+                            color: Colors.white,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        )
+                            : const SizedBox(),
+                        const SizedBox(height: 40),
                       ],
                     ),
                   ),
-                ),
-              ],
-                    ),
-
-                    const SizedBox(height: 16),
-
-                    // Name
-                    _isLoading
-                        ? Container(
-                      width: 140,
-                      height: 18,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(9),
-                      ),
-                    )
-                        : Text(
-                      _currentUser?['fullName'] ?? 'User',
-                      style: const TextStyle(
-                        fontSize: 28,
-                        fontFamily: 'Garet',
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
-
-                    const SizedBox(height: 4),
-
-                    // Email
-                    _isLoading
-                        ? Container(
-                      width: 160,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
-                        borderRadius: BorderRadius.circular(7),
-                      ),
-                    )
-                        : _currentUser != null
-                        ? Text(
-                      _currentUser?['email'] ?? _currentUser?['mobile'] ?? 'No contact info',
-                      style: const TextStyle(
-                        fontSize: 13,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w400,
-                      ),
-                    )
-                        : const SizedBox(),
-
-                    const SizedBox(height: 40),
-                  ],
-                ),
+                ],
               ),
             ),
           ),
@@ -454,7 +282,7 @@ class _ProfilePageState extends State<ProfilePage> {
           Expanded(
             child: Container(
               color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(20, 30, 20, 0),
+              padding: const EdgeInsets.fromLTRB(30, 30, 30, 0),
               child: Column(
                 children: [
                   _buildMenuButton(
@@ -530,10 +358,6 @@ class _ProfilePageState extends State<ProfilePage> {
   }
 
   Widget _buildMenuButton({
-    required IconData icon,
-    required String title,
-    required VoidCallback onTap,
-    bool isLogout = false,
     IconData? icon,
     required String title,
     required VoidCallback onTap,
@@ -542,57 +366,12 @@ class _ProfilePageState extends State<ProfilePage> {
       onTap: onTap,
       child: Container(
         width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: const Color(0xFFE5E7EB),
-            width: 1.5,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 4,
-              offset: const Offset(0, 2),
-            ),
-          ],
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isLogout ? Colors.red : const Color(0xFF6366F1),
-              size: 20,
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w500,
-                  color: isLogout ? Colors.red : const Color(0xFF6366F1),
-                ),
-              ),
-            ),
-            Icon(
-              Icons.arrow_forward_ios_rounded,
-              color: isLogout ? Colors.red : const Color(0xFF6366F1),
-              size: 16,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
         padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: Color(0xFF5C5B5B),
+            color: Color(0xFF2c5b97),
             width: 1.5,
           ),
         ),
@@ -609,9 +388,9 @@ class _ProfilePageState extends State<ProfilePage> {
             ],
 
             // Title
-        Expanded(
-        child: gradientText(title),
-    ),
+            Expanded(
+              child: gradientText(title),
+            ),
 
             // REMOVE RIGHT ARROW
           ],
@@ -625,8 +404,8 @@ class _ProfilePageState extends State<ProfilePage> {
       blendMode: BlendMode.srcIn, // IMPORTANT
       shaderCallback: (bounds) => const LinearGradient(
         colors: [
-          Color(0xFF4A5C8C),
-          Color(0xFF7B5FCF),
+          Color(0xFF2c5b97),
+          Color(0xFFcb6ce6),
         ],
       ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
       child: Text(
@@ -634,15 +413,12 @@ class _ProfilePageState extends State<ProfilePage> {
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: Colors.white,  // Must be white for ShaderMask
+          color: Colors.white, // Must be white for ShaderMask
           fontFamily: "Garet",
         ),
       ),
     );
   }
-
-
-
 
   Widget _buildBottomNavigationBar() {
     return Container(
@@ -740,9 +516,11 @@ class _ProfilePageState extends State<ProfilePage> {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.shopping_cart_outlined, size: 24, color: Colors.white),
-                child: const Icon(Icons.shopping_cart_outlined,
-                    size: 24, color: Colors.white),
+                child: const Icon(
+                  Icons.shopping_cart_outlined,
+                  size: 24,
+                  color: Colors.white,
+                ),
               ),
               label: '',
             ),
@@ -777,37 +555,4 @@ class _ProfilePageState extends State<ProfilePage> {
       ),
     );
   }
-}
-
-class WavePainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.white.withOpacity(0.1)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2;
-
-    // Draw multiple wave lines
-    for (int i = 0; i < 6; i++) {
-      final path = Path();
-      final yOffset = size.height * 0.3 + (i * 20.0);
-
-      path.moveTo(0, yOffset);
-
-      for (double x = 0; x <= size.width; x += 20) {
-        final y = yOffset + (10 * (i % 2 == 0 ? 1 : -1));
-        path.quadraticBezierTo(
-          x,
-          y,
-          x + 20,
-          yOffset,
-        );
-      }
-
-      canvas.drawPath(path, paint);
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
