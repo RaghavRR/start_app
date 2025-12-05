@@ -2,9 +2,6 @@ import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
 
-List<dynamic> appointments = [];
-bool isLoading = true;
-
 class MyAppointmentPage extends StatefulWidget {
   const MyAppointmentPage({super.key});
 
@@ -12,21 +9,23 @@ class MyAppointmentPage extends StatefulWidget {
   State<MyAppointmentPage> createState() => _MyAppointmentPageState();
 }
 
-class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTickerProviderStateMixin {
+class _MyAppointmentPageState extends State<MyAppointmentPage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _currentBottomIndex = 1; // Appointments tab selected
+  List<dynamic> appointments = [];
+  bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
 
-    // ✅ Initialize the TabController with 3 tabs
+    // Initialize the TabController with 3 tabs
     _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
 
-    // ✅ Then fetch appointments
+    // Then fetch appointments
     _fetchAppointments();
   }
-
 
   Future<void> _fetchAppointments() async {
     try {
@@ -34,7 +33,7 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
 
       if (token == null) return;
 
-      final result = await ApiService.fetchAppointments(token:token);
+      final result = await ApiService.fetchAppointments(token: token);
 
       if (result['ok'] == true) {
         setState(() {
@@ -44,6 +43,9 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
       }
     } catch (e) {
       debugPrint('Error fetching appointments: $e');
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -62,7 +64,7 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
 
       if (result['ok'] == true) {
         setState(() {
-          appointments.removeWhere((appt) => appt['_id'] == id); // ✅ UI se hata do
+          appointments.removeWhere((appt) => appt['_id'] == id);
         });
 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -89,7 +91,6 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
     }
   }
 
-
   Future<void> _updateAppointment(String id, DateTime newDate, String newTime) async {
     try {
       final token = await AuthService.getToken();
@@ -105,10 +106,14 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
         "time": newTime,
       };
 
-      final result = await ApiService.updateAppointment(token: token, id: id, body: body);
+      final result = await ApiService.updateAppointment(
+          token: token,
+          id: id,
+          body: body
+      );
 
       if (result['ok'] == true) {
-        // ✅ Update local list for instant UI change
+        // Update local list for instant UI change
         setState(() {
           final index = appointments.indexWhere((a) => a['_id'] == id);
           if (index != -1) {
@@ -125,7 +130,9 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['error'] ?? 'Failed to update appointment')),
+          SnackBar(
+            content: Text(result['error'] ?? 'Failed to update appointment'),
+          ),
         );
       }
     } catch (e) {
@@ -134,7 +141,6 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
       );
     }
   }
-
 
   Future<bool> _showCancelDialog(BuildContext context) async {
     return await showDialog(
@@ -165,7 +171,6 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
     ) ?? false;
   }
 
-
   void _showRescheduleDialog(BuildContext context, String id, Map<String, dynamic> appt) async {
     DateTime? newDate;
     String? newTime;
@@ -184,9 +189,11 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
                   // 📅 Select New Date
                   ListTile(
                     leading: const Icon(Icons.calendar_today, color: Color(0xFF7B5FCF)),
-                    title: Text(newDate == null
-                        ? 'Select New Date'
-                        : '${newDate!.day}-${newDate!.month}-${newDate!.year}'),
+                    title: Text(
+                        newDate == null
+                            ? 'Select New Date'
+                            : '${newDate!.day}-${newDate!.month}-${newDate!.year}'
+                    ),
                     onTap: () async {
                       final picked = await showDatePicker(
                         context: context,
@@ -229,8 +236,8 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF7B5FCF),
-                    foregroundColor: Colors.white, 
-                    textStyle: const TextStyle(fontWeight: FontWeight.w600), 
+                    foregroundColor: Colors.white,
+                    textStyle: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   onPressed: () async {
                     if (newDate == null || newTime == null) {
@@ -251,12 +258,6 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
         );
       },
     );
-  }
-
-
-
-
-    _tabController = TabController(length: 3, vsync: this, initialIndex: 1);
   }
 
   @override
@@ -372,7 +373,10 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
 
     if (appointments.isEmpty) {
       return const Center(
-        child: Text('No appointments found'),
+        child: Text(
+          'No appointments found',
+          style: TextStyle(color: Colors.grey, fontSize: 16),
+        ),
       );
     }
 
@@ -382,34 +386,18 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
       itemBuilder: (context, index) {
         final appt = appointments[index];
         return _buildAppointmentCard(
-          icon: Icons.medical_services,
-          title: appt['procedure'] ?? 'Unknown',
-          name: appt['fullName'] ?? '',
-          date: appt['date'] != null
-              ? appt['date'].toString().substring(0, 10)
-              : '',
-          time: appt['time'] ?? '',
-          status: appt['status'] ?? 'Pending',
-          id: appt['_id'],
-          appt: appt
+            icon: Icons.medical_services,
+            title: appt['procedure'] ?? 'Unknown',
+            name: appt['fullName'] ?? '',
+            date: appt['date'] != null
+                ? appt['date'].toString().substring(0, 10)
+                : '',
+            time: appt['time'] ?? '',
+            status: appt['status'] ?? 'Pending',
+            id: appt['_id'],
+            appt: appt
         );
       },
-    );
-  }
-
-
-    return ListView(
-      padding: const EdgeInsets.all(20),
-      children: [
-        _buildAppointmentCard(
-          icon: Icons.medical_services,
-          title: 'CT Scan - Neck',
-          name: 'Abshixav Sharma',
-          date: '05th July 2025',
-          time: '05:22 PM',
-          status: 'Pending',
-        ),
-      ],
     );
   }
 
@@ -512,7 +500,7 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
                     case 'cancel':
                       final confirmed = await _showCancelDialog(context);
                       if (confirmed) {
-                        _cancelAppointment(id); // ✅ backend delete call
+                        _cancelAppointment(id);
                       }
                       break;
                     case 'reschedule':
@@ -522,16 +510,6 @@ class _MyAppointmentPageState extends State<MyAppointmentPage> with SingleTicker
                       ScaffoldMessenger.of(context).showSnackBar(
                         const SnackBar(content: Text('Help option coming soon...')),
                       );
-                onSelected: (value) {
-                  switch (value) {
-                    case 'cancel':
-                    // Handle cancel appointment
-                      break;
-                    case 'reschedule':
-                    // Handle reschedule
-                      break;
-                    case 'help':
-                    // Handle help
                       break;
                   }
                 },

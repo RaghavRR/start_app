@@ -1,11 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-// Import your api_service.dart here
-// import 'api_service.dart';
 import 'api_service.dart';
-
-const bool enableTestData = true;
-
 
 class VerifyOTPPage extends StatefulWidget {
   const VerifyOTPPage({super.key});
@@ -64,83 +59,28 @@ class _VerifyOTPPageState extends State<VerifyOTPPage> {
     });
 
     try {
-      // Call API - Uncomment when ApiService is imported
-      /*
-      final result = await ApiService.verifyOTP(
+      final result = await ApiService.verifyOtp(
         mobile: _mobile!,
         otp: otp,
       );
 
-      if (result['success']) {
-        // Navigate to home page
+      if (result['ok'] == true) {
         Navigator.pushNamedAndRemoveUntil(
           context,
           '/home',
-          (route) => false,
+              (route) => false,
         );
       } else {
-        _showError(result['error']);
+        _showError(result['error'] ?? 'Invalid OTP');
       }
-      */
-
-      // Mock implementation for demo
-      await Future.delayed(const Duration(seconds: 2));
-
-      // Simulate success
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/home',
-            (route) => false,
-      );
     } catch (e) {
-      _showError('Something went wrong. Please try again.');
+      _showError(e.toString());
     } finally {
       setState(() {
         _isLoading = false;
       });
     }
   }
-Future<void> _handleVerifyOTP() async {
-  final otp = _getOTP();
-
-  if (otp.length != 6) {
-    _showError('Please enter complete OTP');
-    return;
-  }
-
-  if (_mobile == null) {
-    _showError('Mobile number not found');
-    return;
-  }
-
-  setState(() {
-    _isLoading = true;
-  });
-
-  try {
-    final result = await ApiService.verifyOtp(
-      mobile: _mobile!,
-      otp: otp,
-    );
-
-    if (result['ok'] == true) {
-      Navigator.pushNamedAndRemoveUntil(
-        context,
-        '/home',
-        (route) => false,
-      );
-    } else {
-      _showError(result['error'] ?? 'Invalid OTP');
-    }
-  } catch (e) {
-    _showError(e.toString());
-  } finally {
-    setState(() {
-      _isLoading = false;
-    });
-  }
-}
-
 
   Future<void> _handleResendOTP() async {
     if (_mobile == null) {

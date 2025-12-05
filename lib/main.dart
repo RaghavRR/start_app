@@ -8,8 +8,6 @@ import 'profile_page.dart';
 import 'home_page.dart';
 import 'book_appointment_flow.dart';
 import 'dart:math' as math;
-import 'package:shared_preferences/shared_preferences.dart';
-
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,7 +15,7 @@ void main() async {
   // Check if user is already logged in
   final isLoggedIn = await AuthService.isLoggedIn();
 
-  runApp(MyApp(initialRoute: isLoggedIn ? '/home' : '/landing'));
+  runApp(MyApp(initialRoute: isLoggedIn ? '/home' : '/splash'));
 }
 
 class MyApp extends StatelessWidget {
@@ -36,6 +34,7 @@ class MyApp extends StatelessWidget {
       ),
       initialRoute: initialRoute,
       routes: {
+        '/splash': (context) => const SplashScreen(),
         '/landing': (context) => const LandingPage(),
         '/login': (context) => const LoginPage(),
         '/create-account': (context) => const CreateAccountPage(),
@@ -51,13 +50,13 @@ class MyApp extends StatelessWidget {
 // Splash Screen
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
-  const SplashScreen({Key? key}) : super(key: key);
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeInAnimation;
   late Animation<double> _fadeOutAnimation;
@@ -87,9 +86,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
     _controller.forward();
 
+    // Navigate after splash duration
     Future.delayed(const Duration(milliseconds: 4000), () {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, '/landing');
+        // Check if user is logged in to determine where to navigate
+        AuthService.isLoggedIn().then((isLoggedIn) {
+          Navigator.pushReplacementNamed(
+            context,
+            isLoggedIn ? '/home' : '/landing',
+          );
+        });
       }
     });
   }
@@ -187,7 +193,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   }
 }
 
-// Star Painter - FIXED VERSION
+// Star Painter
 class StarPainter extends CustomPainter {
   final Color color;
 
