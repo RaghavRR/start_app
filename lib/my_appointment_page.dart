@@ -101,9 +101,25 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
         return;
       }
 
+      // Format time if needed
+      String formattedTime = newTime;
+      if (newTime.contains('AM') || newTime.contains('PM')) {
+        final timeParts = newTime.split(' ');
+        final time = timeParts[0];
+        final period = timeParts[1];
+
+        if (period == 'PM' && time != '12:00') {
+          final hour = int.parse(time.split(':')[0]);
+          final minute = time.split(':')[1];
+          formattedTime = '${hour + 12}:$minute';
+        } else {
+          formattedTime = time;
+        }
+      }
+
       final body = {
         "date": newDate.toIso8601String(),
-        "time": newTime,
+        "time": formattedTime,
       };
 
       final result = await ApiService.updateAppointment(
@@ -113,12 +129,12 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
       );
 
       if (result['ok'] == true) {
-        // Update local list for instant UI change
+        // Update local list
         setState(() {
           final index = appointments.indexWhere((a) => a['_id'] == id);
           if (index != -1) {
             appointments[index]['date'] = newDate.toIso8601String();
-            appointments[index]['time'] = newTime;
+            appointments[index]['time'] = formattedTime;
           }
         });
 
@@ -623,6 +639,7 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
                 break;
               case 3:
               // Navigate to Reports
+                Navigator.pushReplacementNamed(context, '/myreports');
                 break;
               case 4:
                 Navigator.pushNamed(context, '/profile');

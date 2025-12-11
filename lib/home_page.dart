@@ -724,6 +724,7 @@ class _HomePageState extends State<HomePage> {
               case 2:
                 break;
               case 3:
+                Navigator.pushReplacementNamed(context, '/myreports');
                 break;
               case 4:
                 Navigator.pushNamed(context, '/profile');

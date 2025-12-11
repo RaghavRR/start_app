@@ -91,7 +91,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 children: [
                   // Background Image
                   Image.asset(
-                    'assets/images/profile_bg.jpg', // Change to your image path
+                    'assets/images/profile_bg.jpg',
                     width: double.infinity,
                     height: 320, // Adjust height as needed
                     fit: BoxFit.cover,
@@ -112,32 +112,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     },
                   ),
 
-                  // Dark overlay for better text readability
-                  Container(
-                    width: double.infinity,
-                    height: 320,
-                    decoration: BoxDecoration(
-                      gradient: LinearGradient(
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                        colors: [
-                          Colors.black.withOpacity(0.3),
-                          Colors.black.withOpacity(0.6),
-                        ],
-                      ),
-                      borderRadius: const BorderRadius.only(
-                        bottomLeft: Radius.circular(30),
-                        bottomRight: Radius.circular(30),
-                      ),
-                    ),
-                  ),
+
 
                   // Content
                   SafeArea(
                     bottom: false,
                     child: Column(
                       children: [
-                        // Header with title and edit icon
                         Padding(
                           padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                           child: Row(
@@ -170,7 +151,6 @@ class _ProfilePageState extends State<ProfilePage> {
                         ),
                         const SizedBox(height: 10),
 
-                        // Profile Picture
                         Container(
                           width: 100,
                           height: 100,
@@ -365,47 +345,52 @@ class _ProfilePageState extends State<ProfilePage> {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: Color(0xFF2c5b97),
-            width: 1.5,
-          ),
-        ),
-        child: Row(
-          children: [
-            // SHOW ICON ONLY IF NOT NULL
-            if (icon != null) ...[
-              Icon(
-                icon,
-                color: Color(0xFF8B7FCF),
-                size: 20,
-              ),
-              SizedBox(width: 12),
+          gradient: const LinearGradient(
+            colors: [
+              Color(0xFF79A3E0), // very light blue
+              Color(0xFFF2CFFD), // very light purple
             ],
+          ),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        padding: const EdgeInsets.all(1.8), // border width
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(18), // must be smaller
+          ),
+          child: Row(
+            children: [
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  color: Color(0xFF8B7FCF),
+                  size: 20,
+                ),
+                SizedBox(width: 12),
+              ],
 
-            // Title
-            Expanded(
-              child: gradientText(title),
-            ),
-
-            // REMOVE RIGHT ARROW
-          ],
+              Expanded(
+                child: gradientText(title),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+
 
   Widget gradientText(String text) {
     return ShaderMask(
       blendMode: BlendMode.srcIn, // IMPORTANT
       shaderCallback: (bounds) => const LinearGradient(
         colors: [
-          Color(0xFF2c5b97),
-          Color(0xFFcb6ce6),
+          Color(0xFF79A3E0), // very light blue
+          Color(0xFFF2CFFD),
         ],
       ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
       child: Text(
@@ -413,7 +398,7 @@ class _ProfilePageState extends State<ProfilePage> {
         style: const TextStyle(
           fontSize: 14,
           fontWeight: FontWeight.w400,
-          color: Colors.white, // Must be white for ShaderMask
+          color: Colors.white,
           fontFamily: "Garet",
         ),
       ),
@@ -460,6 +445,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 break;
               case 3:
               // Navigate to Reports
+                Navigator.pushReplacementNamed(context, '/myreports');
                 break;
               case 4:
               // Already on Profile

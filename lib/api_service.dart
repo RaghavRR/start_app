@@ -47,6 +47,24 @@ class ApiService {
     }
   }
 
+
+  // Add this static method to ApiService class
+  static String formatTimeForApi(String time) {
+    if (time.contains('AM') || time.contains('PM')) {
+      final timeParts = time.split(' ');
+      final timeValue = timeParts[0];
+      final period = timeParts[1];
+
+      if (period == 'PM' && timeValue != '12:00') {
+        final hour = int.parse(timeValue.split(':')[0]);
+        final minute = timeValue.split(':')[1];
+        return '${hour + 12}:$minute';
+      }
+      return timeValue;
+    }
+    return time;
+  }
+
   // ------------------ GET REQUEST ------------------
   static Future<Map<String, dynamic>> getRequest(
     String endpoint, {

@@ -1,4 +1,8 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:xstar_app/my_appointment_page.dart';
+import 'api_service.dart';
+import 'auth_service.dart';
 
 class BookAppointmentFlow extends StatefulWidget {
   const BookAppointmentFlow({super.key});
@@ -20,6 +24,10 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
   DateTime currentMonth = DateTime.now();
   String? selectedTime;
   String? paymentMethod;
+
+  // Add loading state
+  bool _isBooking = false;
+  bool _showSuccessDialog = false;
 
   final List<String> centers = [
     'Select your Star Center',
@@ -58,6 +66,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
   }
 
   void _nextPage() {
+    if (_isBooking) return;
+
     if (_currentStep < 1) {
       setState(() {
         _currentStep++;
@@ -68,12 +78,23 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
         curve: Curves.easeInOut,
       );
     } else if (_currentStep == 1) {
-      // Show payment bottom sheet instead of going to step 3
+      // Validate step 2 before showing payment
+      if (selectedTime == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Please select a time slot'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        return;
+      }
       _showPaymentBottomSheet();
     }
   }
 
   void _previousPage() {
+    if (_isBooking) return;
+
     if (_currentStep > 0) {
       setState(() {
         _currentStep--;
@@ -163,6 +184,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
     return compareDate.isBefore(today);
   }
 
+  // In your _BookAppointmentFlowState class, update the payment method section:
+
   void _showPaymentBottomSheet() {
     showModalBottomSheet(
       context: context,
@@ -192,14 +215,14 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
               ),
               const SizedBox(height: 24),
 
-              // Payment Options
+              // Payment Options - UPDATED VALUES
               Row(
                 children: [
                   Expanded(
                     child: _buildPaymentOptionBottomSheet(
                       'Pay at Center',
                       Icons.business,
-                      'center',
+                      'Pay at Center', // EXACTLY as API expects
                       setModalState,
                     ),
                   ),
@@ -208,7 +231,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                     child: _buildPaymentOptionBottomSheet(
                       'Pay Now',
                       Icons.credit_card,
-                      'now',
+                      'Pay Now', // EXACTLY as API expects
                       setModalState,
                     ),
                   ),
@@ -247,12 +270,16 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
-                  onPressed: () {
+                  onPressed: _isBooking
+                      ? null
+                      : () async {
                     Navigator.pop(context);
-                    _bookAppointment();
+                    await _bookAppointment();
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF7B5FCF),
+                    backgroundColor: _isBooking
+                        ? Colors.grey
+                        : const Color(0xFF7B5FCF),
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
@@ -260,7 +287,16 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                     ),
                     elevation: 0,
                   ),
-                  child: const Text(
+                  child: _isBooking
+                      ? const SizedBox(
+                    height: 20,
+                    width: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor: AlwaysStoppedAnimation(Colors.white),
+                    ),
+                  )
+                      : const Text(
                     'BOOK NOW',
                     style: TextStyle(
                       fontSize: 16,
@@ -450,9 +486,11 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                     children: [
                       // Back Button
                       ElevatedButton(
-                        onPressed: _previousPage,
+                        onPressed: _isBooking ? null : _previousPage,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF9B8FCF),
+                          backgroundColor: _isBooking
+                              ? Colors.grey
+                              : const Color(0xFF9B8FCF),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -477,9 +515,11 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                       ),
                       // Next Button
                       ElevatedButton(
-                        onPressed: _nextPage,
+                        onPressed: _isBooking ? null : _nextPage,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF8B7FCF),
+                          backgroundColor: _isBooking
+                              ? Colors.grey
+                              : const Color(0xFF8B7FCF),
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                           shape: RoundedRectangleBorder(
@@ -507,6 +547,21 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                 ),
               ],
             ),
+
+            // Loading Overlay
+            if (_isBooking)
+              Container(
+                color: Colors.black.withOpacity(0.5),
+                child: const Center(
+                  child: CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation(Colors.white),
+                  ),
+                ),
+              ),
+
+            // Success Dialog
+            if (_showSuccessDialog)
+              _buildSuccessDialog(),
           ],
         ),
       ),
@@ -1043,9 +1098,135 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
     );
   }
 
-  void _bookAppointment() {
-    if (fullName.isEmpty || mobileNumber.isEmpty || selectedCenter == null ||
-        selectedCenter == 'Select your Star Center' || selectedTime == null) {
+  Widget _buildSuccessDialog() {
+    return Container(
+      color: Colors.black.withOpacity(0.5),
+      child: Center(
+        child: Container(
+          margin: const EdgeInsets.all(20),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // Success Icon
+              Container(
+                width: 80,
+                height: 80,
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: const Icon(
+                  Icons.check_circle,
+                  color: Colors.green,
+                  size: 50,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // Title
+              const Text(
+                'Appointment Confirmed!',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.green,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Message
+              const Text(
+                'Your appointment has been successfully booked.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 16,
+                  color: Color(0xFF6B7280),
+                ),
+              ),
+              const SizedBox(height: 8),
+
+              const Text(
+                'You will receive a confirmation SMS shortly.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Color(0xFF9CA3AF),
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () {
+                        setState(() {
+                          _showSuccessDialog = false;
+                        });
+                        Navigator.pop(context);
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        side: const BorderSide(color: Color(0xFF7B5FCF)),
+                      ),
+                      child: const Text(
+                        'Close',
+                        style: TextStyle(
+                          color: Color(0xFF7B5FCF),
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        setState(() {
+                          _showSuccessDialog = false;
+                        });
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const MyAppointmentPage(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF7B5FCF),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      child: const Text(
+                        'View Appointments',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Future<void> _bookAppointment() async {
+    // Validate all required fields
+    if (fullName.isEmpty ||
+        mobileNumber.isEmpty ||
+        selectedCenter == null ||
+        selectedCenter == 'Select your Star Center' ||
+        selectedTime == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Please fill all required fields'),
@@ -1055,12 +1236,139 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Appointment Booked Successfully!'),
-        backgroundColor: Colors.green,
+    setState(() {
+      _isBooking = true;
+    });
+
+    try {
+      // Get user token
+      final token = await AuthService.getToken();
+
+      if (token == null || token.isEmpty) {
+        setState(() {
+          _isBooking = false;
+        });
+        _showLoginPrompt();
+        return;
+      }
+
+      // Format time from "09:00 AM" to "09:00" (24-hour format if needed)
+      String formattedTime = selectedTime!;
+
+      // Convert "09:00 AM" to "09:00" and "02:00 PM" to "14:00"
+      if (selectedTime!.contains('AM') || selectedTime!.contains('PM')) {
+        final timeParts = selectedTime!.split(' ');
+        final time = timeParts[0];
+        final period = timeParts[1];
+
+        if (period == 'PM' && time != '12:00') {
+          final hour = int.parse(time.split(':')[0]);
+          final minute = time.split(':')[1];
+          formattedTime = '${hour + 12}:$minute';
+        } else {
+          formattedTime = time;
+        }
+      }
+
+      // Prepare appointment data EXACTLY as API expects
+      final appointmentData = {
+        'procedure': 'CT Scan - Abdomen', // Fixed as per UI
+        'center': selectedCenter!.replaceAll('Select your Star Center', '').trim(),
+        'fullName': fullName,
+        'mobile': mobileNumber,
+        'email': emailAddress.isNotEmpty ? emailAddress : '',
+        'doctor': referringDoctor.isNotEmpty ? referringDoctor : '',
+        'date': selectedDate.toIso8601String(),
+        'time': formattedTime,
+        'paymentMethod': paymentMethod ?? 'Pay at Center', // Default if not selected
+      };
+
+      print('📤 Sending appointment data to API:');
+      print('📤 Token: ${token.substring(0, 20)}...');
+      print('📤 Data: $appointmentData');
+
+      // Call API to create appointment
+      final response = await ApiService.createAppointment(
+        token: token,
+        body: appointmentData,
+      );
+
+      setState(() {
+        _isBooking = false;
+      });
+
+      print('📥 API Response: $response');
+
+      if (response['ok'] == true) {
+        // Show success
+        setState(() {
+          _showSuccessDialog = true;
+        });
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['message'] ?? 'Appointment Booked Successfully!'),
+            backgroundColor: Colors.green,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(response['error'] ?? 'Booking failed'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } catch (e) {
+      setState(() {
+        _isBooking = false;
+      });
+
+      print('❌ Booking error details:');
+      print('❌ Error: $e');
+
+      // Provide user-friendly error message
+      String errorMessage = 'Booking failed. Please try again.';
+
+      if (e.toString().contains('paymentMethod')) {
+        errorMessage = 'Please select a valid payment method.';
+      } else if (e.toString().contains('401')) {
+        errorMessage = 'Session expired. Please login again.';
+      } else if (e.toString().contains('500')) {
+        errorMessage = 'Server error. Please try again later.';
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(errorMessage),
+          backgroundColor: Colors.red,
+          duration: const Duration(seconds: 5),
+        ),
+      );
+    }
+  }
+
+  void _showLoginPrompt() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Login Required'),
+        content: const Text('You need to login to book an appointment.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pushNamed(context, '/login');
+            },
+            child: const Text('Login'),
+          ),
+        ],
       ),
     );
-    Navigator.pop(context);
   }
 }
