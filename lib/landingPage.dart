@@ -93,7 +93,6 @@ class _LandingPageState extends State<LandingPage>
                   fontWeight: FontWeight.w800,
                   height: 1.15,
                   letterSpacing: 3,
-                  fontFamily: 'Garet',
                 ),
               ),
               const SizedBox(height: 8),
@@ -106,7 +105,6 @@ class _LandingPageState extends State<LandingPage>
                   fontWeight: FontWeight.w800,
                   height: 1.15,
                   letterSpacing: 3,
-                  fontFamily: 'Garet',
                 ),
               ),
               const SizedBox(height: 10),
@@ -117,7 +115,7 @@ class _LandingPageState extends State<LandingPage>
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 11,
+                    fontSize: 13,
                     height: 1.5,
                     fontWeight: FontWeight.w400,
                     letterSpacing: 0.2,
@@ -130,32 +128,36 @@ class _LandingPageState extends State<LandingPage>
               Expanded(
                 child: Stack(
                   children: [
-                    // Doctor image positioned from bottom - full height
+                    // Doctor image positioned at bottom with maximum size
                     Positioned(
-                      top: 30,
                       bottom: 0,
                       left: 0,
                       right: 0,
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 0),
-                        child: Image.asset(
-                          'assets/images/doctor.png',
-                          fit: BoxFit.fitHeight,
-                          alignment: Alignment.bottomCenter,
-                          errorBuilder: (context, error, stack) {
-                            return Container(
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.15),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              alignment: Alignment.center,
-                              child: const Icon(
-                                Icons.person,
-                                size: 120,
-                                color: Colors.white60,
-                              ),
-                            );
-                          },
+                      child: Center(
+                        child: Container(
+                          height: MediaQuery.of(context).size.height * 0.95, // 95% of screen height - almost full screen
+                          constraints: BoxConstraints(
+                            maxWidth: MediaQuery.of(context).size.width * 1.0, // Full width
+                          ),
+                          child: Image.asset(
+                            'assets/images/doctor.png',
+                            fit: BoxFit.contain,
+                            alignment: Alignment.bottomCenter,
+                            errorBuilder: (context, error, stack) {
+                              return Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.15),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                alignment: Alignment.center,
+                                child: const Icon(
+                                  Icons.person,
+                                  size: 120,
+                                  color: Colors.white60,
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -188,7 +190,7 @@ class _LandingPageState extends State<LandingPage>
       width: _buttonWidth,
       height: _buttonHeight,
       decoration: BoxDecoration(
-        color: const Color(0xFF5A7DB0).withOpacity(0.85),
+        color: const Color(0xFF3073D3).withOpacity(0.85),
         borderRadius: BorderRadius.circular(32.5),
         boxShadow: [
           BoxShadow(
@@ -210,7 +212,7 @@ class _LandingPageState extends State<LandingPage>
                   'Get Started',
                   style: TextStyle(
                     color: Colors.white,
-                    fontSize: 16,
+                    fontSize: 22,
                     fontWeight: FontWeight.w600,
                     letterSpacing: 0.5,
                   ),

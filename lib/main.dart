@@ -4,6 +4,7 @@ import 'landingPage.dart';
 import 'create_account_page.dart';
 import 'login_page.dart';
 import 'my_appointment_page.dart';
+import 'my_reports_page.dart';
 import 'profile_page.dart';
 import 'home_page.dart';
 import 'book_appointment_flow.dart';
@@ -37,6 +38,7 @@ class MyApp extends StatelessWidget {
         '/splash': (context) => const SplashScreen(),
         '/landing': (context) => const LandingPage(),
         '/login': (context) => const LoginPage(),
+        '/myreports': (context) => const MyReportsPage(),
         '/create-account': (context) => const CreateAccountPage(),
         '/appointments': (context) => const MyAppointmentPage(),
         '/profile': (context) => const ProfilePage(),

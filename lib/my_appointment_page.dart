@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
@@ -101,9 +103,25 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
         return;
       }
 
+      // Format time if needed
+      String formattedTime = newTime;
+      if (newTime.contains('AM') || newTime.contains('PM')) {
+        final timeParts = newTime.split(' ');
+        final time = timeParts[0];
+        final period = timeParts[1];
+
+        if (period == 'PM' && time != '12:00') {
+          final hour = int.parse(time.split(':')[0]);
+          final minute = time.split(':')[1];
+          formattedTime = '${hour + 12}:$minute';
+        } else {
+          formattedTime = time;
+        }
+      }
+
       final body = {
         "date": newDate.toIso8601String(),
-        "time": newTime,
+        "time": formattedTime,
       };
 
       final result = await ApiService.updateAppointment(
@@ -113,12 +131,12 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
       );
 
       if (result['ok'] == true) {
-        // Update local list for instant UI change
+        // Update local list
         setState(() {
           final index = appointments.indexWhere((a) => a['_id'] == id);
           if (index != -1) {
             appointments[index]['date'] = newDate.toIso8601String();
-            appointments[index]['time'] = newTime;
+            appointments[index]['time'] = formattedTime;
           }
         });
 
@@ -294,48 +312,75 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
             ),
 
             // Tab Bar
+            // Tab Bar
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               decoration: BoxDecoration(
                 color: const Color(0xFF4A5C8C),
                 borderRadius: BorderRadius.circular(10),
               ),
-              child: TabBar(
-                controller: _tabController,
-                indicator: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFA78BFA), Color(0xFFC084FC)],
+              child: SizedBox(
+                height: 44, // Adjust this to your preferred height (was ~56 before)
+                child: TabBar(
+                  controller: _tabController,
+                  indicator: BoxDecoration(
+                    gradient: const LinearGradient(
+                      colors: [Color(0xFFA78BFA), Color(0xFFC084FC)],
+                    ),
+                    borderRadius: BorderRadius.circular(8), // Slightly smaller radius
                   ),
-                  borderRadius: BorderRadius.circular(10),
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white70,
+                  labelStyle: const TextStyle(
+                    fontSize: 14, // Slightly smaller
+                    fontWeight: FontWeight.w600,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  indicatorSize: TabBarIndicatorSize.tab,
+
+                  // 🔽 Reduced vertical padding but still keeping some 🔽
+                  labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
+
+                  // Reduce top/bottom padding of the entire TabBar
+                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 0),
+
+                  // Reduce the indicator padding to make selector smaller
+                  indicatorPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+
+                  dividerColor: Colors.transparent,
+                  tabs: const [
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Past',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Today',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                    Tab(
+                      child: Align(
+                        alignment: Alignment.center,
+                        child: Text(
+                          'Upcoming',
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-                labelColor: Colors.white,
-                unselectedLabelColor: Colors.white70,
-                labelStyle: const TextStyle(
-                  fontSize: 15,
-                  fontWeight: FontWeight.w600,
-                ),
-                indicatorSize: TabBarIndicatorSize.tab,
-                dividerColor: Colors.transparent,
-                tabs: const [
-                  Tab(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: Text('Past'),
-                    ),
-                  ),
-                  Tab(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: Text('Today'),
-                    ),
-                  ),
-                  Tab(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      child: Text('Upcoming'),
-                    ),
-                  ),
-                ],
               ),
             ),
 
@@ -422,37 +467,45 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
   }) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.fromLTRB(18, 10, 18, 10),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(12),
+        color: const Color(0xffece9e9),
+        borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 2),
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 12,
+            offset: const Offset(0, 4),
           ),
         ],
       ),
       child: Row(
         children: [
-          // Icon
+          // ICON BOX
           Container(
-            width: 50,
-            height: 50,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
-              color: const Color(0xFF4A5C8C).withOpacity(0.1),
-              borderRadius: BorderRadius.circular(10),
+              borderRadius: BorderRadius.circular(14),
+              gradient: const LinearGradient(
+                colors: [
+                  Color(0xFF6366F1),
+                  Color(0xFF4F46E5),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
             ),
             child: Icon(
               icon,
-              color: const Color(0xFF4A5C8C),
-              size: 28,
+              color: Colors.white,
+              size: 30,
             ),
           ),
-          const SizedBox(width: 14),
 
-          // Details
+          const SizedBox(width: 16),
+
+          // DETAILS
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -460,9 +513,9 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
                 Text(
                   title,
                   style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
+                    fontSize: 17,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF000000),
                   ),
                 ),
                 const SizedBox(height: 4),
@@ -470,38 +523,51 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
                   name,
                   style: const TextStyle(
                     fontSize: 13,
-                    color: Color(0xFF6B7280),
+                    color: Color(0xFF000000),
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$date $time',
+                  '$date   $time',
                   style: const TextStyle(
-                    fontSize: 12,
-                    color: Color(0xFF9CA3AF),
+                    fontSize: 13,
+                    color: Color(0xFF000000),
                   ),
                 ),
               ],
             ),
           ),
 
-          // Status and Menu
+          // MENU + STATUS
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
+              // Glass blurry effect three dots - FIXED VERSION
               PopupMenuButton<String>(
-                icon: const Icon(Icons.more_vert, color: Color(0xFF6B7280)),
-                offset: const Offset(0, 40),
+                icon: Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Colors.black.withOpacity(0.05),
+                  ),
+                  child: const Icon(
+                    Icons.more_horiz,
+                    size: 20,
+                    color: Color(0xFF4A5568),
+                  ),
+                ),
+                offset: const Offset(-20, 40),
+                color: Colors.transparent,
+                surfaceTintColor: Colors.transparent,
+                elevation: 0,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
                 onSelected: (value) async {
                   switch (value) {
                     case 'cancel':
                       final confirmed = await _showCancelDialog(context);
-                      if (confirmed) {
-                        _cancelAppointment(id);
-                      }
+                      if (confirmed) _cancelAppointment(id);
                       break;
                     case 'reschedule':
                       _showRescheduleDialog(context, id, appt);
@@ -513,64 +579,225 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
                       break;
                   }
                 },
-                itemBuilder: (BuildContext context) => [
-                  const PopupMenuItem<String>(
-                    value: 'cancel',
-                    child: Text(
-                      'Cancel Appointment',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF1F2937),
+                itemBuilder: (BuildContext context) {
+                  return [
+                    // Main container with glass effect
+                    PopupMenuItem<String>(
+                      value: '',
+                      enabled: false,
+                      height: 0,
+                      padding: EdgeInsets.zero,
+                      child: Container(
+                        width: 220,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(16),
+                          child: BackdropFilter(
+                            filter: ImageFilter.blur(
+                              sigmaX: 15.0,
+                              sigmaY: 15.0,
+                              tileMode: TileMode.clamp,
+                            ),
+                            child: Container(
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.15),
+                                borderRadius: BorderRadius.circular(16),
+                                border: Border.all(
+                                  color: Colors.white.withOpacity(0.2),
+                                  width: 1.0,
+                                ),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.1),
+                                    blurRadius: 25,
+                                    spreadRadius: 2,
+                                    offset: const Offset(0, 4),
+                                  ),
+                                ],
+                              ),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  // Cancel Appointment
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context); // Close menu
+                                        _showCancelDialog(context).then((confirmed) {
+                                          if (confirmed) _cancelAppointment(id);
+                                        });
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 28,
+                                              height: 28,
+                                              decoration: BoxDecoration(
+                                                color: Colors.red.shade600.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Icon(
+                                                Icons.cancel_outlined,
+                                                color: Colors.red.shade600,
+                                                size: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'Cancel Appointment',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.red.shade600,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Divider
+                                  Container(
+                                    height: 0.5,
+                                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                                    color: Colors.white.withOpacity(0.2),
+                                  ),
+
+                                  // Reschedule
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context); // Close menu
+                                        _showRescheduleDialog(context, id, appt);
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 28,
+                                              height: 28,
+                                              decoration: BoxDecoration(
+                                                color: Colors.blue.shade600.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Icon(
+                                                Icons.schedule_outlined,
+                                                color: Colors.blue.shade600,
+                                                size: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'Reschedule',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.blue.shade600,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+
+                                  // Divider
+                                  Container(
+                                    height: 0.5,
+                                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                                    color: Colors.white.withOpacity(0.2),
+                                  ),
+
+                                  // Help
+                                  Material(
+                                    color: Colors.transparent,
+                                    child: InkWell(
+                                      onTap: () {
+                                        Navigator.pop(context); // Close menu
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('Help option coming soon...')),
+                                        );
+                                      },
+                                      child: Container(
+                                        width: double.infinity,
+                                        padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              width: 28,
+                                              height: 28,
+                                              decoration: BoxDecoration(
+                                                color: Colors.grey.shade700.withOpacity(0.1),
+                                                borderRadius: BorderRadius.circular(8),
+                                              ),
+                                              child: Icon(
+                                                Icons.help_outline,
+                                                color: Colors.grey.shade700,
+                                                size: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(width: 12),
+                                            Text(
+                                              'Help',
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                color: Colors.grey.shade700,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'reschedule',
-                    child: Text(
-                      'Reschedule',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF1F2937),
-                      ),
-                    ),
-                  ),
-                  const PopupMenuItem<String>(
-                    value: 'help',
-                    child: Text(
-                      'Help',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Color(0xFF1F2937),
-                      ),
-                    ),
-                  ),
-                ],
+                  ];
+                },
               ),
-              const SizedBox(height: 8),
+
+              const SizedBox(height: 12),
+
+              // STATUS PILL
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEF3C7),
-                  borderRadius: BorderRadius.circular(6),
+                  color: const Color(0xFFE8FAD9),
+                  borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Container(
-                      width: 6,
-                      height: 6,
+                      width: 7,
+                      height: 7,
                       decoration: const BoxDecoration(
-                        color: Color(0xFFFBBF24),
+                        color: Color(0xFF4ADE80),
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: 5),
                     Text(
                       status,
                       style: const TextStyle(
                         fontSize: 11,
-                        color: Color(0xFFB45309),
                         fontWeight: FontWeight.w600,
+                        color: Color(0xFF15803D),
                       ),
                     ),
                   ],
@@ -583,133 +810,298 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
     );
   }
 
-  Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C4A7C),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+// Helper method to create glass menu item content
+  Widget _buildGlassMenuItemContent({
+    required IconData icon,
+    required String label,
+    required Color color,
+  }) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {}, // Empty onTap - handled by PopupMenuItem
+        splashColor: Colors.white.withOpacity(0.1),
+        highlightColor: Colors.white.withOpacity(0.05),
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 16),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [
+                Colors.white.withOpacity(0.1),
+                Colors.white.withOpacity(0.05),
+              ],
+            ),
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _currentBottomIndex,
-          onTap: (index) {
-            setState(() {
-              _currentBottomIndex = index;
-            });
-            // Handle navigation
-            switch (index) {
-              case 0:
-                Navigator.pushNamed(context, '/home');
-                break;
-              case 1:
-              // Already on Appointments
-                break;
-              case 2:
-              // Navigate to Cart
-                break;
-              case 3:
-              // Navigate to Reports
-                break;
-              case 4:
-                Navigator.pushNamed(context, '/profile');
-                break;
-            }
-          },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color(0xFF2C4A7C),
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white60,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-          items: [
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
+          child: Row(
+            children: [
+              Container(
+                width: 28,
+                height: 28,
                 decoration: BoxDecoration(
-                  color: _currentBottomIndex == 0
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
+                  color: color.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(8),
                 ),
-                child: const Icon(Icons.home_outlined, size: 26),
-              ),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentBottomIndex == 1
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
+                child: Icon(
+                  icon,
+                  color: color,
+                  size: 16,
                 ),
-                child: const Icon(Icons.calendar_today_outlined, size: 24),
               ),
-              label: 'Appointments',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: color,
+                    fontWeight: FontWeight.w500,
+                    letterSpacing: 0.2,
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFEC4899).withOpacity(0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+
+  Widget _buildBottomNavigationBar() {
+    return ClipRect(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
+        ),
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.11,  // Use standard height with padding
+            child: Stack(
+              children: [
+                // Background Image
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/navbar_bg.jpg',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback gradient if image fails to load
+                      return Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF2C4A7C), Color(0xFF1E3A5F)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+
+                // Semi-transparent overlay for better icon visibility
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.2),
+                          Colors.black.withOpacity(0.4),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Bottom Navigation Bar
+                BottomNavigationBar(
+                  currentIndex: _currentBottomIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _currentBottomIndex = index;
+                    });
+                    switch (index) {
+                      case 0:
+                        Navigator.pushNamed(context, '/home');
+                        break;
+                      case 1:
+                        break;
+                      case 2:
+                        break;
+                      case 3:
+                        Navigator.pushReplacementNamed(context, '/myreports');
+                        break;
+                      case 4:
+                        Navigator.pushNamed(context, '/profile');
+                        break;
+                    }
+                  },
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.transparent, // Make it transparent
+                  selectedItemColor: Colors.white,
+                  unselectedItemColor: Colors.white.withOpacity(0.7),
+                  selectedFontSize: 12,
+                  unselectedFontSize: 12,
+                  selectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  elevation: 0, // Remove default shadow
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 0
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 0
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.home_outlined, size: 24),
+                      ),
+                      label: 'Home',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 1
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 1
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.calendar_today_outlined, size: 24),
+                      ),
+                      label: 'Appointments',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFEC4899).withOpacity(0.6),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                      label: '',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 3
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 3
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.description_outlined, size: 24),
+                      ),
+                      label: 'My Reports',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 4
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 4
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.person_outline, size: 24),
+                      ),
+                      label: 'Profile',
                     ),
                   ],
                 ),
-                child: const Icon(Icons.shopping_cart_outlined, size: 24),
-              ),
-              label: '',
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentBottomIndex == 3
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.description_outlined, size: 24),
-              ),
-              label: 'My Reports',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentBottomIndex == 4
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person_outline, size: 26),
-              ),
-              label: 'Profile',
-            ),
-          ],
+          ),
         ),
       ),
     );

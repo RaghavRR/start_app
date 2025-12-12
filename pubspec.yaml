@@ -32,6 +32,7 @@ dependencies:
     sdk: flutter
   http: ^1.1.0
   shared_preferences: ^2.2.2
+  url_launcher: ^6.1.0
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -69,6 +70,7 @@ flutter:
     - assets/images/doctor.png
     - assets/images/home_bg.png
     - assets/images/profile_bg.jpg
+    - assets/images/navbar_bg.jpg
 
   fonts:
     - family: Garet
