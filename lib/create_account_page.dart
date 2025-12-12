@@ -462,8 +462,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                               : Text(
                             _otpSent ? 'Verify OTP' : 'Create Account',
                             style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 19,
+                              fontWeight: FontWeight.bold,
                               color: Colors.white,
                               letterSpacing: 0.2,
                             ),

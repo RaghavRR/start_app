@@ -435,8 +435,8 @@ void initState() {
                         : Text(
                       _otpSent ? 'Verify OTP' : 'Send OTP',
                       style: const TextStyle(
-                        fontSize: 17,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 19,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
                         letterSpacing: 0.2,
                       ),

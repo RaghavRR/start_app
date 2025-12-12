@@ -155,7 +155,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+          color: Color(0xFFd9d9d9),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
@@ -199,7 +199,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
               "Lab Number: $caseNumber",
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
             ),
 
@@ -210,7 +210,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
               createdDate,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
             ),
 
@@ -221,7 +221,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
               procedure,
               style: TextStyle(
                 fontSize: 14,
-                color: Colors.grey[700],
+                color: Colors.black,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -234,7 +234,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
               children: [
                 // Download Report Button
                 Expanded(
-                  child: OutlinedButton.icon(
+                  child: TextButton.icon(
                     onPressed: () {
                       final pdfUrl = report["reportFile"]?["url"];
                       if (pdfUrl != null && pdfUrl.isNotEmpty) {
@@ -256,26 +256,22 @@ class _MyReportsPageState extends State<MyReportsPage> {
                     label: const Text(
                       "Download Report",
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
+                        color: Color(0xFF7C3AED),
                       ),
                     ),
-                    style: OutlinedButton.styleFrom(
-                      foregroundColor: const Color(0xFF7C3AED),
-                      side: const BorderSide(
-                        color: Color(0xFF7C3AED),
-                        width: 1.5,
-                      ),
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 12,
-                        vertical: 12,
-                      ),
+                      backgroundColor: Colors.transparent, // optional
+                      foregroundColor: const Color(0xFF7C3AED),
                     ),
                   ),
                 ),
+
 
                 const SizedBox(width: 12),
 
@@ -297,10 +293,11 @@ class _MyReportsPageState extends State<MyReportsPage> {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 14,
+                        horizontal: 0, // reduced horizontal padding
+                        vertical: 10,   // reduced vertical padding
                       ),
                       elevation: 0,
+                      minimumSize: const Size(0, 0), // allows button to shrink
                     ),
                     child: const Text(
                       "View Details",
@@ -310,7 +307,8 @@ class _MyReportsPageState extends State<MyReportsPage> {
                       ),
                     ),
                   ),
-                ),
+                )
+
               ],
             ),
           ],
@@ -346,115 +344,236 @@ class _MyReportsPageState extends State<MyReportsPage> {
   }
 
   Widget _buildBottomNavigationBar() {
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF2C4A7C),
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.1),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
+    return ClipRect(
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
           ),
-        ],
-      ),
-      child: ClipRRect(
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(24),
-          topRight: Radius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.1),
+              blurRadius: 10,
+              offset: const Offset(0, -2),
+            ),
+          ],
         ),
-        child: BottomNavigationBar(
-          currentIndex: _currentBottomIndex,
-          onTap: (index) {
-            setState(() {
-              _currentBottomIndex = index;
-            });
-            _handleNavigation(index, context);
-          },
-          type: BottomNavigationBarType.fixed,
-          backgroundColor: const Color(0xFF2C4A7C),
-          selectedItemColor: Colors.white,
-          unselectedItemColor: Colors.white60,
-          selectedFontSize: 12,
-          unselectedFontSize: 12,
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600),
-          items: [
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentBottomIndex == 0
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.home_outlined, size: 26),
-              ),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentBottomIndex == 1
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.calendar_today_outlined, size: 24),
-              ),
-              label: 'Appointments',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+        child: ClipRRect(
+          borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(24),
+            topRight: Radius.circular(24),
+          ),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.11,  // Use standard height with padding
+            child: Stack(
+              children: [
+                // Background Image
+                Positioned.fill(
+                  child: Image.asset(
+                    'assets/images/navbar_bg.jpg',
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) {
+                      // Fallback gradient if image fails to load
+                      return Container(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [Color(0xFF2C4A7C), Color(0xFF1E3A5F)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      );
+                    },
                   ),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: const Color(0xFFEC4899).withOpacity(0.4),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                ),
+
+                // Semi-transparent overlay for better icon visibility
+                Positioned.fill(
+                  child: Container(
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.black.withOpacity(0.2),
+                          Colors.black.withOpacity(0.4),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+
+                // Bottom Navigation Bar
+                BottomNavigationBar(
+                  currentIndex: _currentBottomIndex,
+                  onTap: (index) {
+                    setState(() {
+                      _currentBottomIndex = index;
+                    });
+                    switch (index) {
+                      case 0:
+                        Navigator.pushNamed(context, '/home');
+                        break;
+                      case 1:
+                        Navigator.pushNamed(context, '/appointments');
+                        break;
+                      case 2:
+                        break;
+                      case 3:
+                        break;
+                      case 4:
+                        Navigator.pushNamed(context, '/profile');
+                        break;
+                    }
+                  },
+                  type: BottomNavigationBarType.fixed,
+                  backgroundColor: Colors.transparent, // Make it transparent
+                  selectedItemColor: Colors.white,
+                  unselectedItemColor: Colors.white.withOpacity(0.7),
+                  selectedFontSize: 12,
+                  unselectedFontSize: 12,
+                  selectedLabelStyle: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    shadows: [
+                      Shadow(
+                        color: Colors.black,
+                        blurRadius: 2,
+                        offset: Offset(1, 1),
+                      ),
+                    ],
+                  ),
+                  elevation: 0, // Remove default shadow
+                  items: [
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 0
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 0
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.home_outlined, size: 24),
+                      ),
+                      label: 'Home',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 1
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 1
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.calendar_today_outlined, size: 24),
+                      ),
+                      label: 'Appointments',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          gradient: const LinearGradient(
+                            colors: [Color(0xFFEC4899), Color(0xFFF472B6)],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            BoxShadow(
+                              color: const Color(0xFFEC4899).withOpacity(0.6),
+                              blurRadius: 10,
+                              spreadRadius: 1,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: const Icon(
+                          Icons.shopping_cart_outlined,
+                          size: 20,
+                          color: Colors.white,
+                        ),
+                      ),
+                      label: '',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 3
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 3
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.description_outlined, size: 24),
+                      ),
+                      label: 'My Reports',
+                    ),
+                    BottomNavigationBarItem(
+                      icon: Container(
+                        padding: const EdgeInsets.all(6),
+                        decoration: BoxDecoration(
+                          color: _currentBottomIndex == 4
+                              ? Colors.white.withOpacity(0.2)
+                              : Colors.transparent,
+                          shape: BoxShape.circle,
+                          boxShadow: _currentBottomIndex == 4
+                              ? [
+                            BoxShadow(
+                              color: Colors.white.withOpacity(0.3),
+                              blurRadius: 6,
+                              spreadRadius: 1,
+                            ),
+                          ]
+                              : [],
+                        ),
+                        child: const Icon(Icons.person_outline, size: 24),
+                      ),
+                      label: 'Profile',
                     ),
                   ],
                 ),
-                child: const Icon(Icons.shopping_cart_outlined, size: 24),
-              ),
-              label: '',
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentBottomIndex == 3
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.description_outlined, size: 24),
-              ),
-              label: 'My Reports',
-            ),
-            BottomNavigationBarItem(
-              icon: Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _currentBottomIndex == 4
-                      ? Colors.white.withOpacity(0.2)
-                      : Colors.transparent,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person_outline, size: 26),
-              ),
-              label: 'Profile',
-            ),
-          ],
+          ),
         ),
       ),
     );
