@@ -71,6 +71,7 @@ flutter:
     - assets/images/home_bg.png
     - assets/images/profile_bg.jpg
     - assets/images/navbar_bg.jpg
+    - assets/images/splashlogo.png
 
   fonts:
     - family: Garet
