@@ -287,120 +287,105 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F7),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header
-            Container(
-              padding: const EdgeInsets.all(20),
-              child: ShaderMask(
-                shaderCallback: (bounds) => const LinearGradient(
-                  colors: [Color(0xFF4A5C8C), Color(0xFF7B5FCF)],
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                ).createShader(bounds),
-                child: const Text(
-                  'My Appointment',
-                  style: TextStyle(
-                    fontSize: 32,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/new_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
+
+
+
+          // ✅ Actual content in SafeArea
+          SafeArea(
+            child: Column(
+              children: [
+                // Header
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  child: ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [Color(0xFF4A5C8C), Color(0xFF7B5FCF)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ).createShader(bounds),
+                    child: const Text(
+                      'My Appointment',
+                      style: TextStyle(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
-              ),
-            ),
 
-            // Tab Bar
-            // Tab Bar
-            Container(
-              margin: const EdgeInsets.symmetric(horizontal: 20),
-              decoration: BoxDecoration(
-                color: const Color(0xFF4A5C8C),
-                borderRadius: BorderRadius.circular(10),
-              ),
-              child: SizedBox(
-                height: 44, // Adjust this to your preferred height (was ~56 before)
-                child: TabBar(
-                  controller: _tabController,
-                  indicator: BoxDecoration(
-                    gradient: const LinearGradient(
-                      colors: [Color(0xFFA78BFA), Color(0xFFC084FC)],
-                    ),
-                    borderRadius: BorderRadius.circular(8), // Slightly smaller radius
+                // Tab Bar
+                Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF4A5C8C),
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  labelColor: Colors.white,
-                  unselectedLabelColor: Colors.white70,
-                  labelStyle: const TextStyle(
-                    fontSize: 14, // Slightly smaller
-                    fontWeight: FontWeight.w600,
+                  child: SizedBox(
+                    height: 44,
+                    child: TabBar(
+                      controller: _tabController,
+                      indicator: BoxDecoration(
+                        gradient: const LinearGradient(
+                          colors: [Color(0xFFA78BFA), Color(0xFFC084FC)],
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      labelColor: Colors.white,
+                      unselectedLabelColor: Colors.white70,
+                      labelStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                      unselectedLabelStyle: const TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      indicatorSize: TabBarIndicatorSize.tab,
+                      labelPadding:
+                      const EdgeInsets.symmetric(vertical: 8),
+                      padding:
+                      const EdgeInsets.symmetric(vertical: 2),
+                      indicatorPadding:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+                      dividerColor: Colors.transparent,
+                      tabs: const [
+                        Tab(text: 'Past'),
+                        Tab(text: 'Today'),
+                        Tab(text: 'Upcoming'),
+                      ],
+                    ),
                   ),
-                  unselectedLabelStyle: const TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                  ),
-                  indicatorSize: TabBarIndicatorSize.tab,
-
-                  // 🔽 Reduced vertical padding but still keeping some 🔽
-                  labelPadding: const EdgeInsets.symmetric(vertical: 8, horizontal: 0),
-
-                  // Reduce top/bottom padding of the entire TabBar
-                  padding: const EdgeInsets.symmetric(vertical: 2, horizontal: 0),
-
-                  // Reduce the indicator padding to make selector smaller
-                  indicatorPadding: const EdgeInsets.symmetric(vertical: 4, horizontal: 2),
-
-                  dividerColor: Colors.transparent,
-                  tabs: const [
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Past',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Today',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                    Tab(
-                      child: Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Upcoming',
-                          textAlign: TextAlign.center,
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            ),
 
-            // Tab Content
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildPastTab(),
-                  _buildTodayTab(),
-                  _buildUpcomingTab(),
-                ],
-              ),
+                // Tab Content
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildPastTab(),
+                      _buildTodayTab(),
+                      _buildUpcomingTab(),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );
   }
+
 
   Widget _buildPastTab() {
     return const Center(

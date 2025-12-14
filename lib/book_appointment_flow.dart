@@ -1,8 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:xstar_app/my_appointment_page.dart';
+import 'package:xstar_app/home_page.dart';
 import 'api_service.dart';
 import 'auth_service.dart';
+import 'package:lottie/lottie.dart';
 
 class BookAppointmentFlow extends StatefulWidget {
   const BookAppointmentFlow({super.key});
@@ -218,55 +219,64 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            Column(
-              children: [
-                // Header
-                _buildHeader(),
+      body: Stack(
+        children: [
+          // ✅ FULL SCREEN BACKGROUND (no SafeArea)
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/new_bg.png',
+              fit: BoxFit.cover,
+            ),
+          ),
 
-                // Content (only 3 steps now)
-                Expanded(
-                  child: PageView(
-                    controller: _pageController,
-                    physics: const NeverScrollableScrollPhysics(),
-                    children: [
-                      _buildStep1ProcedureSelection(),
-                      _buildStep2PatientInfo(),
-                      _buildStep3DateTime(),
-                      // Removed _buildStep4Payment() from here
-                    ],
-                  ),
+          // ✅ App content inside SafeArea
+          SafeArea(
+            child: Stack(
+              children: [
+                Column(
+                  children: [
+                    _buildHeader(),
+
+                    Expanded(
+                      child: PageView(
+                        controller: _pageController,
+                        physics: const NeverScrollableScrollPhysics(),
+                        children: [
+                          _buildStep1ProcedureSelection(),
+                          _buildStep2PatientInfo(),
+                          _buildStep3DateTime(),
+                        ],
+                      ),
+                    ),
+
+                    _buildNavigationButtons(),
+                  ],
                 ),
 
-                // Navigation Buttons
-                _buildNavigationButtons(),
+                if (_isBooking)
+                  Container(
+                    color: Colors.black.withOpacity(0.5),
+                    child: const Center(
+                      child: CircularProgressIndicator(
+                        valueColor:
+                        AlwaysStoppedAnimation(Color(0xFF6B5FCF)),
+                      ),
+                    ),
+                  ),
+
+                if (_showSuccessDialog) _buildSuccessDialog(),
               ],
             ),
-
-            if (_isBooking)
-              Container(
-                color: Colors.black.withOpacity(0.5),
-                child: const Center(
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation(Color(0xFF6B5FCF)),
-                  ),
-                ),
-              ),
-
-            if (_showSuccessDialog) _buildSuccessDialog(),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
 
+
   Widget _buildHeader() {
     return Container(
       padding: const EdgeInsets.all(20),
-      color: Colors.white,
       child: Column(
         children: [
           // Back button and title
@@ -383,7 +393,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
   // STEP 1: Procedure Selection (Image 3)
   Widget _buildStep1ProcedureSelection() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20,0,20,20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -536,7 +546,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
   // STEP 2: Patient Information (Image 1)
   Widget _buildStep2PatientInfo() {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.fromLTRB(20,0,20,20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -544,7 +554,6 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -558,7 +567,6 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                     color: Color(0xFF1F2937),
                   ),
                 ),
-                const SizedBox(height: 12),
                 Text(
                   'Procedure : ${selectedScanType ?? 'CT Scan'} - ${selectedProcedureDescription ?? 'Abdomen'}',
                   style: const TextStyle(
@@ -567,7 +575,6 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                     color: Color(0xFF1F2937),
                   ),
                 ),
-                const SizedBox(height: 4),
                 Text(
                   'Center : ${selectedCenter ?? 'STAR Radiology - Noida'}',
                   style: const TextStyle(
@@ -582,24 +589,34 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
           const SizedBox(height: 24),
 
           // Patient Information
-          const Text(
-            'Patient Information',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFF1F2937),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16,0,16,0),
+            child: const Text(
+              'Patient Information',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Color(0xFF1F2937),
+              ),
             ),
           ),
+
           const SizedBox(height: 16),
 
-          _buildTextField(
-            hint: 'Full Name',
-            onChanged: (value) => fullName = value,
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 16),
+            child: _buildTextField(
+              hint: 'Full Name',
+              onChanged: (value) => fullName = value,
+            ),
           ),
+
           const SizedBox(height: 12),
 
           // Mobile Number with country flag
-          Container(
+          Padding(
+          padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 16),
+          child: Container(
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(12),
               gradient: const LinearGradient(
@@ -648,19 +665,25 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
               ),
             ),
           ),
+          ),
 
           const SizedBox(height: 12),
 
-          _buildTextField(
+    Padding(
+    padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 16),
+         child:  _buildTextField(
             hint: 'Email Address ( Optional )',
             onChanged: (value) => emailAddress = value,
           ),
+    ),
           const SizedBox(height: 12),
-
-          _buildTextField(
+    Padding(
+    padding: const EdgeInsets.symmetric(vertical: 0,horizontal: 16),
+    child:_buildTextField(
             hint: 'Reffering Doctor',
             onChanged: (value) => referringDoctor = value,
           ),
+    ),
         ],
       ),
     );
@@ -680,7 +703,6 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
           Container(
             padding: const EdgeInsets.symmetric(vertical: 0),
             decoration: BoxDecoration(
-              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(
@@ -744,7 +766,6 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -816,7 +837,6 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
           Container(
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Column(
@@ -1896,12 +1916,25 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
   }
 
   Widget _buildSuccessDialog() {
+    // Extract just the center name without "STAR Radiology -" prefix
+    String displayCenterName = selectedCenter ?? 'STAR Radiology - Noida';
+    if (displayCenterName.contains('STAR Radiology - ')) {
+      displayCenterName =
+          displayCenterName.replaceAll('STAR Radiology - ', '');
+    }
+
+    // Get the scan type without "Select your Scan..."
+    String displayScanType = selectedScanType ?? 'CT Scan';
+    if (displayScanType == 'Select your Scan...') {
+      displayScanType = 'CT Scan';
+    }
+
     return Container(
       color: Colors.black.withOpacity(0.5),
       child: Center(
         child: Container(
           margin: const EdgeInsets.all(20),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.fromLTRB(24, 48, 24, 38),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.circular(20),
@@ -1909,92 +1942,127 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(
-                  Icons.check_circle,
-                  color: Colors.green,
-                  size: 50,
+              // Success Animation using Lottie
+              SizedBox(
+                width: 120,
+                height: 120,
+                child: Lottie.asset(
+                  'assets/animations/success.json', // Add your Lottie animation file
+                  fit: BoxFit.contain,
+                  repeat: true,
+                  animate: true,
                 ),
               ),
+
               const SizedBox(height: 20),
+
+              // Title
               const Text(
-                'Appointment Confirmed!',
+                'Appointment Booked',
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: Colors.green,
+                  color: Colors.black,
+                  letterSpacing: 3.5,
                 ),
               ),
+
               const SizedBox(height: 16),
-              const Text(
-                'Your appointment has been successfully booked.',
+
+              // Description
+              RichText(
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Color(0xFF6B7280)),
+                text: TextSpan(
+                  style: const TextStyle(
+                    fontSize: 16,
+                    color: Color(0xFF6B7280),
+                    height: 1.5,
+                  ),
+                  children: [
+                  const TextSpan(
+                  text: 'Your Appointment for ',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Color(0xFF009f93), // grey color
+                  ),
+                ),
+                    TextSpan(
+                      text: displayScanType,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF009f93)
+                      ),
+                    ),
+                    const TextSpan(
+                      text: ' at Star Radiology ',
+                      style: TextStyle(fontSize: 12,
+                          color: Color(0xFF009f93)
+                      ),
+                    ),
+                    TextSpan(
+                      text: displayCenterName,
+                      style: const TextStyle(
+                        fontSize: 12,
+                          color: Color(0xFF009f93)
+                      ),
+                    ),
+                    const TextSpan(
+                      text: ' is successfully booked.',
+                      style: TextStyle(fontSize: 12,
+                          color: Color(0xFF009f93)
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              const SizedBox(height: 8),
-              const Text(
-                'You will receive a confirmation SMS shortly.',
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Color(0xFF9CA3AF)),
-              ),
+
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        setState(() {
-                          _showSuccessDialog = false;
-                        });
-                        Navigator.pop(context);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        side: const BorderSide(color: Color(0xFF8B7FCF)),
+
+              // Gradient Button
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.centerLeft,
+                    end: Alignment.centerRight,
+                    colors: [
+                      Color(0xFF003373),
+                      Color(0xFFcb6ce6),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: ElevatedButton(
+                  onPressed: () {
+                    setState(() {
+                      _showSuccessDialog = false;
+                    });
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HomePage(),
                       ),
-                      child: const Text(
-                        'Close',
-                        style: TextStyle(
-                          color: Color(0xFF8B7FCF),
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
+                    );
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    shadowColor: Colors.transparent,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'BACK TO HOME',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      letterSpacing: 1.5,
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () {
-                        setState(() {
-                          _showSuccessDialog = false;
-                        });
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const MyAppointmentPage(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF8B7FCF),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                      ),
-                      child: const Text(
-                        'View Appointments',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
             ],
           ),

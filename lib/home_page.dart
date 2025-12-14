@@ -94,29 +94,28 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: SafeArea(
-        child: Stack(
-          children: [
-            // Background Image from local assets - FULL SCREEN
-            Positioned.fill(
-              child: Image.asset(
-                'assets/images/home_bg.png',
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    color: const Color(0xFFF8FAFF),
-                  );
-                },
-              ),
+      body: Stack(
+        children: [
+          // Background Image from local assets - FULL SCREEN (outside SafeArea)
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/home_bg.png',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) {
+                return Container(
+                  color: const Color(0xFFF8FAFF),
+                );
+              },
             ),
+          ),
 
-            // Content - FULL SCREEN
-            Column(
+          // Content with SafeArea
+          SafeArea(
+            child: Column(
               children: [
-                // Header Section - REMOVED the gradient background
+                // Header Section
                 Container(
                   padding: const EdgeInsets.all(20),
-                  // REMOVED the gradient decoration to show background image
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -141,7 +140,8 @@ class _HomePageState extends State<HomePage> {
                                 child: const Center(
                                   child: CircularProgressIndicator(
                                     strokeWidth: 2,
-                                    valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF6366F1)),
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Color(0xFF6366F1)),
                                   ),
                                 ),
                               )
@@ -150,7 +150,8 @@ class _HomePageState extends State<HomePage> {
                                 color: const Color(0xFF6366F1),
                                 child: Center(
                                   child: Text(
-                                    _getUserInitials(_currentUser!['fullName'] ?? 'User'),
+                                    _getUserInitials(
+                                        _currentUser!['fullName'] ?? 'User'),
                                     style: const TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -160,7 +161,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               )
                                   : Container(
-                                color: const Color(0xFF6366F1).withOpacity(0.2),
+                                color:
+                                const Color(0xFF6366F1).withOpacity(0.2),
                                 child: const Icon(
                                   Icons.person,
                                   color: Color(0xFF6366F1),
@@ -397,8 +399,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );

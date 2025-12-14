@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'create_account_page.dart';
+import 'auth_service.dart'; // Add this import
+import 'home_page.dart'; // Add this import
 
 class LandingPage extends StatefulWidget {
   const LandingPage({Key? key}) : super(key: key);
@@ -287,15 +289,11 @@ class _LandingPageState extends State<LandingPage>
                     ),
                   ],
                 ),
-                child: Center(
-                  child: AnimatedRotation(
-                    duration: const Duration(milliseconds: 300),
-                    turns: progress * 0.2,
-                    child: Icon(
-                      Icons.arrow_forward_rounded,
-                      color: const Color(0xFF5A7DB0),
-                      size: 26,
-                    ),
+                child: const Center(
+                  child: Icon(
+                    Icons.arrow_forward_rounded,
+                    color: Color(0xFF5A7DB0),
+                    size: 26,
                   ),
                 ),
               ),
@@ -306,25 +304,39 @@ class _LandingPageState extends State<LandingPage>
     );
   }
 
-  void _completeSwipe() {
+  void _completeSwipe() async {
     if (_isAnimating) return;
 
     final maxDrag = _buttonWidth - _buttonHeight;
     _animateToPosition(maxDrag);
 
+    // Check if user is logged in
+    final isLoggedIn = await AuthService.isLoggedIn();
+
     Future.delayed(const Duration(milliseconds: 350), () {
       _animateToPosition(0.0);
 
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => const CreateAccountPage(),
-        ),
-      ).then((_) {
-        if (mounted) {
-          _animateToPosition(0.0);
-        }
-      });
+      if (isLoggedIn) {
+        // User is logged in - navigate to home page
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const HomePage(),
+          ),
+        );
+      } else {
+        // User is not logged in - navigate to create account page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const CreateAccountPage(),
+          ),
+        ).then((_) {
+          if (mounted) {
+            _animateToPosition(0.0);
+          }
+        });
+      }
     });
   }
 }

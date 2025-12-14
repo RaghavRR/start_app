@@ -16,7 +16,7 @@ void main() async {
   // Check if user is already logged in
   final isLoggedIn = await AuthService.isLoggedIn();
 
-  runApp(MyApp(initialRoute: isLoggedIn ? '/home' : '/splash'));
+  runApp(MyApp(initialRoute: '/splash')); // Always start with splash
 }
 
 class MyApp extends StatelessWidget {
@@ -91,13 +91,8 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate after splash duration
     Future.delayed(const Duration(milliseconds: 4000), () {
       if (mounted) {
-        // Check if user is logged in to determine where to navigate
-        AuthService.isLoggedIn().then((isLoggedIn) {
-          Navigator.pushReplacementNamed(
-            context,
-            isLoggedIn ? '/home' : '/landing',
-          );
-        });
+        // Always navigate to landing page regardless of login status
+        Navigator.pushReplacementNamed(context, '/landing');
       }
     });
   }
@@ -122,70 +117,79 @@ class _SplashScreenState extends State<SplashScreen>
           return Opacity(
             opacity: opacity,
             child: Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Row(
+              child: Image.asset(
+                'assets/images/splashlogo.png',
+                fit: BoxFit.contain,
+                width: MediaQuery.of(context).size.width * 0.8,
+                height: MediaQuery.of(context).size.width * 0.8,
+                errorBuilder: (context, error, stackTrace) {
+                  // Fallback in case image doesn't exist
+                  return Column(
                     mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomPaint(
-                        size: const Size(60, 60),
-                        painter: StarPainter(
-                          color: const Color(0xFF1E3A8A),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      CustomPaint(
-                        size: const Size(35, 35),
-                        painter: StarPainter(
-                          color: const Color(0xFFD4AF37),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Column(
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Star',
-                            style: TextStyle(
-                              fontSize: 45,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFFD4AF37),
-                              height: 1.0,
+                          CustomPaint(
+                            size: const Size(60, 60),
+                            painter: StarPainter(
+                              color: const Color(0xFF1E3A8A),
                             ),
                           ),
-                          Text(
-                            'Radiology',
-                            style: TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.w600,
-                              fontStyle: FontStyle.italic,
+                          const SizedBox(width: 8),
+                          CustomPaint(
+                            size: const Size(35, 35),
+                            painter: StarPainter(
                               color: const Color(0xFFD4AF37),
-                              height: 0.8,
-                              shadows: [
-                                Shadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  offset: const Offset(1, 1),
-                                  blurRadius: 2,
-                                ),
-                              ],
                             ),
+                          ),
+                          const SizedBox(width: 8),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Star',
+                                style: TextStyle(
+                                  fontSize: 45,
+                                  fontWeight: FontWeight.bold,
+                                  color: Color(0xFFD4AF37),
+                                  height: 1.0,
+                                ),
+                              ),
+                              Text(
+                                'Radiology',
+                                style: TextStyle(
+                                  fontSize: 22,
+                                  fontWeight: FontWeight.w600,
+                                  fontStyle: FontStyle.italic,
+                                  color: const Color(0xFFD4AF37),
+                                  height: 0.8,
+                                  shadows: [
+                                    Shadow(
+                                      color: Colors.black.withOpacity(0.1),
+                                      offset: const Offset(1, 1),
+                                      blurRadius: 2,
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'A best brand For Tele Radiology',
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Color(0xFFE63946),
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ],
-                  ),
-                  const SizedBox(height: 12),
-                  const Text(
-                    'A best brand For Tele Radiology',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFFE63946),
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           );
