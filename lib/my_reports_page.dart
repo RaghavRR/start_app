@@ -85,28 +85,29 @@ class _MyReportsPageState extends State<MyReportsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFFE6E2F7), Colors.white],
-            stops: [0.0, 0.3],
+      body: Stack(
+        children: [
+          // ✅ Background Image
+          Positioned.fill(
+            child: Image.asset(
+              'assets/images/new_bg.png',
+              fit: BoxFit.cover,
+            ),
           ),
-        ),
-        child: SafeArea(
-          child: Column(
-            children: [
-              // Header
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                child: ShaderMask(
-                  shaderCallback: (bounds) => const LinearGradient(
-                    colors: [Color(0xFF003373), Color(0xFFCB6CE6)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ).createShader(bounds),
+
+          // ✅ Content
+          SafeArea(
+            child: Column(
+              children: [
+                // Header
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                  child: ShaderMask(
+                    shaderCallback: (bounds) => const LinearGradient(
+                      colors: [Color(0xFF003373), Color(0xFFCB6CE6)],
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                    ).createShader(bounds),
                     child: const Text(
                       'My Reports',
                       style: TextStyle(
@@ -114,33 +115,34 @@ class _MyReportsPageState extends State<MyReportsPage> {
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),
-                    )
-                ),
-              ),
-
-              // Content
-              Expanded(
-                child: isLoading
-                    ? const Center(child: CircularProgressIndicator())
-                    : reports.isEmpty
-                    ? const Center(
-                  child: Text(
-                    "No reports found.",
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
                   ),
-                )
-                    : ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                  itemCount: reports.length,
-                  itemBuilder: (context, index) {
-                    final r = reports[index];
-                    return _buildReportCard(context, r);
-                  },
                 ),
-              ),
-            ],
+
+                // Content
+                Expanded(
+                  child: isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : reports.isEmpty
+                      ? const Center(
+                    child: Text(
+                      "No reports found.",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
+                    ),
+                  )
+                      : ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemCount: reports.length,
+                    itemBuilder: (context, index) {
+                      final r = reports[index];
+                      return _buildReportCard(context, r);
+                    },
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
+        ],
       ),
       bottomNavigationBar: _buildBottomNavigationBar(),
     );

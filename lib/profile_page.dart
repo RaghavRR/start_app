@@ -93,7 +93,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   Image.asset(
                     'assets/images/profile_bg.jpg',
                     width: double.infinity,
-                    height: 320, // Adjust height as needed
+                    height: 340, // Adjust height as needed
                     fit: BoxFit.cover,
                     errorBuilder: (context, error, stackTrace) {
                       // Fallback gradient if image fails to load
@@ -152,8 +152,8 @@ class _ProfilePageState extends State<ProfilePage> {
                         const SizedBox(height: 10),
 
                         Container(
-                          width: 100,
-                          height: 100,
+                          width: 120,
+                          height: 120,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(

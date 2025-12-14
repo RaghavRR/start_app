@@ -31,6 +31,7 @@ dependencies:
   flutter:
     sdk: flutter
   http: ^1.1.0
+  lottie: ^2.7.0
   shared_preferences: ^2.2.2
   url_launcher: ^6.1.0
 
@@ -72,6 +73,8 @@ flutter:
     - assets/images/profile_bg.jpg
     - assets/images/navbar_bg.jpg
     - assets/images/splashlogo.png
+    - assets/animations/success.json
+    - assets/images/new_bg.png
 
   fonts:
     - family: Garet
