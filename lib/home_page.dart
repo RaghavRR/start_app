@@ -115,7 +115,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 // Header Section
                 Container(
-                  padding: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.fromLTRB(20,10,20,20),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -184,6 +184,8 @@ class _HomePageState extends State<HomePage> {
                                       style: const TextStyle(
                                         fontSize: 20,
                                         letterSpacing: 1,
+                                        fontFamily: 'Garet',
+                                        fontWeight: FontWeight.bold,
                                         color: Color(0xFF4557AE),
                                       ),
                                     ),
@@ -200,9 +202,9 @@ class _HomePageState extends State<HomePage> {
                                       : _currentUser?['fullName'] ?? 'User',
                                   style: const TextStyle(
                                     fontSize: 25,
-                                    fontWeight: FontWeight.w500,
+                                    fontWeight: FontWeight.bold,
                                     fontFamily: 'Garet',
-                                    color: Color(0xFF002c5c),
+                                    color: Color(0xff111112),
                                   ),
                                 ),
                               ],

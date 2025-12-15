@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'TermsAndConditionsScreen.dart';
 import 'auth_service.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -85,75 +86,73 @@ class _ProfilePageState extends State<ProfilePage> {
               bottomLeft: Radius.circular(30),
               bottomRight: Radius.circular(30),
             ),
-            child: Container(
+            child: SizedBox(
+              height: 340,
               width: double.infinity,
               child: Stack(
                 children: [
-                  // Background Image
-                  Image.asset(
-                    'assets/images/profile_bg.jpg',
-                    width: double.infinity,
-                    height: 340, // Adjust height as needed
-                    fit: BoxFit.cover,
-                    errorBuilder: (context, error, stackTrace) {
-                      // Fallback gradient if image fails to load
-                      return Container(
-                        decoration: const BoxDecoration(
-                          gradient: LinearGradient(
-                            begin: Alignment.topCenter,
-                            end: Alignment.bottomCenter,
-                            colors: [
-                              Color(0xFF003373),
-                              Color(0xFF5697EA),
-                            ],
+                  /// Background Image
+                  Positioned.fill(
+                    child: Image.asset(
+                      'assets/images/profile_bg.jpg',
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) {
+                        return Container(
+                          decoration: const BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [Color(0xFF003373), Color(0xFF5697EA)],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
+                            ),
                           ),
-                        ),
-                      );
-                    },
+                        );
+                      },
+                    ),
                   ),
 
-
-
-                  // Content
+                  /// Top Bar
                   SafeArea(
                     bottom: false,
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const SizedBox(width: 40),
+                          Text(
+                            'My Profile',
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withOpacity(0.15),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.edit_outlined,
+                                color: Colors.white, size: 20),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  /// Profile Section (BOTTOM)
+                  Positioned(
+                    left: 0,
+                    right: 0,
+                    bottom: 20,
                     child: Column(
                       children: [
-                        Padding(
-                          padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const SizedBox(width: 40),
-                              Text(
-                                'My Profile',
-                                style: GoogleFonts.poppins(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              Container(
-                                width: 40,
-                                height: 40,
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withOpacity(0.15),
-                                  borderRadius: BorderRadius.circular(40),
-                                ),
-                                child: const Icon(
-                                  Icons.edit_outlined,
-                                  color: Colors.white,
-                                  size: 20,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 10),
-
+                        /// Profile Image
                         Container(
-                          width: 120,
-                          height: 120,
+                          width: 140,
+                          height: 140,
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
@@ -162,94 +161,81 @@ class _ProfilePageState extends State<ProfilePage> {
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.2),
-                                blurRadius: 10,
-                                offset: const Offset(0, 4),
+                                color: Colors.black.withOpacity(0.25),
+                                blurRadius: 12,
+                                offset: const Offset(0, 6),
                               ),
                             ],
                           ),
                           child: ClipOval(
                             child: _isLoading
-                                ? Container(
-                              color: Colors.white.withOpacity(0.15),
-                              child: const Center(
-                                child: CircularProgressIndicator(
-                                  color: Colors.white,
-                                  strokeWidth: 2,
-                                ),
+                                ? const Center(
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
                               ),
                             )
-                                : _currentUser != null
-                                ? Container(
+                                : Container(
                               color: Colors.white.withOpacity(0.15),
                               child: Center(
                                 child: Text(
                                   _getUserInitials(
-                                      _currentUser!['fullName'] ?? 'User'),
+                                      _currentUser?['fullName'] ?? 'User'),
                                   style: const TextStyle(
-                                    fontSize: 36,
+                                    fontSize: 42,
+                                    fontFamily: 'Garet',
                                     fontWeight: FontWeight.w600,
                                     color: Colors.white,
                                   ),
                                 ),
                               ),
-                            )
-                                : Container(
-                              color: Colors.white.withOpacity(0.15),
-                              child: const Icon(
-                                Icons.person,
-                                size: 45,
-                                color: Colors.white,
-                              ),
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16),
 
-                        // Name
+                        const SizedBox(height: 12),
+
+                        /// Name
                         _isLoading
                             ? Container(
-                          width: 140,
-                          height: 18,
+                          width: 160,
+                          height: 20,
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(9),
+                            borderRadius: BorderRadius.circular(10),
                           ),
                         )
                             : Text(
                           _currentUser?['fullName'] ?? 'User',
                           style: const TextStyle(
-                            fontSize: 28,
+                            fontSize: 26,
                             fontFamily: 'Garet',
                             fontWeight: FontWeight.w600,
                             color: Colors.white,
                           ),
                         ),
+
                         const SizedBox(height: 4),
 
-                        // Email
+                        /// Email
                         _isLoading
                             ? Container(
-                          width: 160,
+                          width: 180,
                           height: 14,
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(7),
                           ),
                         )
-                            : _currentUser != null
-                            ? Text(
+                            : Text(
                           _currentUser?['email'] ??
                               _currentUser?['mobile'] ??
                               'No contact info',
                           style: const TextStyle(
                             fontSize: 13,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w400,
+                            color: Colors.white70,
                           ),
-                        )
-                            : const SizedBox(),
-                        const SizedBox(height: 40),
+                        ),
                       ],
                     ),
                   ),
@@ -282,7 +268,12 @@ class _ProfilePageState extends State<ProfilePage> {
                   _buildMenuButton(
                     title: 'Terms & Conditions',
                     onTap: () {
-                      // Navigate to terms
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const TermsAndConditionsScreen(),
+                        ),
+                      );
                     },
                   ),
                   const SizedBox(height: 16),
@@ -292,6 +283,87 @@ class _ProfilePageState extends State<ProfilePage> {
                       // Navigate to report issue
                     },
                   ),
+                  const SizedBox(height: 16),
+
+                  // Logout Button - Added here
+                  GestureDetector(
+                    onTap: _logout,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [
+                            Colors.red.withOpacity(0.9),
+                            Colors.orange.withOpacity(0.7),
+                          ],
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.red.withOpacity(0.3),
+                            blurRadius: 8,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(1.8), // border width
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                gradient: LinearGradient(
+                                  colors: [
+                                    Colors.red.withOpacity(0.9),
+                                    Colors.orange.withOpacity(0.7),
+                                  ],
+                                ),
+                              ),
+                              child: const Icon(
+                                Icons.logout,
+                                color: Colors.white,
+                                size: 18,
+                              ),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: ShaderMask(
+                                blendMode: BlendMode.srcIn,
+                                shaderCallback: (bounds) => LinearGradient(
+                                  colors: [
+                                    Colors.red.withOpacity(0.9),
+                                    Colors.orange.withOpacity(0.7),
+                                  ],
+                                ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+                                child: Text(
+                                  'Logout',
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    fontFamily: 'Garet',
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_forward_ios_rounded,
+                              color: Colors.red.withOpacity(0.7),
+                              size: 16,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+
                   const Spacer(),
                   // Version info
                   Column(
@@ -372,9 +444,13 @@ class _ProfilePageState extends State<ProfilePage> {
                 ),
                 SizedBox(width: 12),
               ],
-
               Expanded(
                 child: gradientText(title),
+              ),
+              Icon(
+                Icons.arrow_forward_ios_rounded,
+                color: Color(0xFF8B7FCF),
+                size: 16,
               ),
             ],
           ),
@@ -383,23 +459,22 @@ class _ProfilePageState extends State<ProfilePage> {
     );
   }
 
-
   Widget gradientText(String text) {
     return ShaderMask(
       blendMode: BlendMode.srcIn, // IMPORTANT
       shaderCallback: (bounds) => const LinearGradient(
         colors: [
-          Color(0xFF79A3E0), // very light blue
-          Color(0xFFF2CFFD),
+          Color(0xFF0953BC), // very light blue
+          Color(0xFFA67DB3),
         ],
       ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
       child: Text(
         text,
         style: const TextStyle(
           fontSize: 14,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.bold,
           color: Colors.white,
-          fontFamily: "Garet",
+          fontFamily: 'Garet',
         ),
       ),
     );
@@ -427,7 +502,7 @@ class _ProfilePageState extends State<ProfilePage> {
             topRight: Radius.circular(24),
           ),
           child: SizedBox(
-            height: MediaQuery.of(context).size.height * 0.11,  // Use standard height with padding
+            height: MediaQuery.of(context).size.height * 0.11,
             child: Stack(
               children: [
                 // Background Image
@@ -490,7 +565,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     }
                   },
                   type: BottomNavigationBarType.fixed,
-                  backgroundColor: Colors.transparent, // Make it transparent
+                  backgroundColor: Colors.transparent,
                   selectedItemColor: Colors.white,
                   unselectedItemColor: Colors.white.withOpacity(0.7),
                   selectedFontSize: 12,
@@ -514,7 +589,7 @@ class _ProfilePageState extends State<ProfilePage> {
                       ),
                     ],
                   ),
-                  elevation: 0, // Remove default shadow
+                  elevation: 0,
                   items: [
                     BottomNavigationBarItem(
                       icon: Container(
