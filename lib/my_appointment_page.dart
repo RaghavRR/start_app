@@ -315,6 +315,7 @@ class _MyAppointmentPageState extends State<MyAppointmentPage>
                       'My Appointment',
                       style: TextStyle(
                         fontSize: 32,
+                        fontFamily: 'Garet',
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
                       ),

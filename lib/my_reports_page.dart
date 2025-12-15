@@ -111,6 +111,7 @@ class _MyReportsPageState extends State<MyReportsPage> {
                     child: const Text(
                       'My Reports',
                       style: TextStyle(
+                        fontFamily: 'Garet',
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                         color: Colors.white,
