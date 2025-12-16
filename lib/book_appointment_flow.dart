@@ -309,7 +309,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                 TextSpan(
                   text: 'Book Your ',
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 28,
+                    fontFamily: 'Garet',
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF1F3A5F),
                   ),
@@ -317,7 +318,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                 TextSpan(
                   text: 'Appointment',
                   style: TextStyle(
-                    fontSize: 30,
+                    fontSize: 28,
+                    fontFamily: 'Garet',
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF8B7FCF),
                   ),
@@ -404,8 +406,9 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
               'Procedure Information',
               style: TextStyle(
                 fontSize: 20,
+                fontFamily: 'Garet',
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
+                color: Color(0xFF111112),
               ),
             ),
           ),
@@ -482,8 +485,9 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                     text: 'Preparation : ',
                     style: TextStyle(
                       fontSize: 15,
+                      fontFamily: 'Garet',
                       fontWeight: FontWeight.bold,
-                      color: Color(0xFF1F2937),
+                      color: Color(0xFF111112),
                     ),
                   ),
                   TextSpan(
@@ -504,8 +508,9 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
               'Select Center',
               style: TextStyle(
                 fontSize: 20,
+                fontFamily: 'Garet',
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
+                color: Color(0xFF111112),
               ),
             ),
           ),
@@ -564,7 +569,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
+                    fontFamily: 'Garet',
+                    color: Color(0xFF111112),
                   ),
                 ),
                 Text(
@@ -572,7 +578,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
+                    fontFamily: 'Garet',
+                    color: Color(0xFF111112),
                   ),
                 ),
                 Text(
@@ -580,7 +587,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF1F2937),
+                    fontFamily: 'Garet',
+                    color: Color(0xFF111112),
                   ),
                 ),
               ],
@@ -596,7 +604,8 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Color(0xFF1F2937),
+                fontFamily: 'Garet',
+                color: Color(0xFF111112),
               ),
             ),
           ),
@@ -779,6 +788,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Garet',
                         color: Color(0xFF003373),
                       ),
                     ),
@@ -850,6 +860,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                       style: TextStyle(
                         fontSize: 22,
                         fontWeight: FontWeight.bold,
+                        fontFamily: 'Garet',
                         color: Color(0xFF003373),
                       ),
                     ),
@@ -1275,6 +1286,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                             style: TextStyle(
                               fontSize: 22,
                               fontWeight: FontWeight.bold,
+                              fontFamily: 'Garet',
                               color: Color(0xFF002c5c),
                             ),
                           ),
@@ -1621,6 +1633,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                               style: TextStyle(
                                 fontSize: 22,
                                 fontWeight: FontWeight.bold,
+                                fontFamily: 'Garet',
                                 color: Color(0xFF000000),
                               ),
                             ),
@@ -1962,6 +1975,7 @@ class _BookAppointmentFlowState extends State<BookAppointmentFlow> {
                 style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
+                  fontFamily: 'Garet',
                   color: Colors.black,
                   letterSpacing: 3.5,
                 ),
